@@ -1,23 +1,20 @@
-// ─────────────────────────────────────────────────────────────
-// navigation/AppNavigator.tsx
-// Bottom tab navigator — 5 tabs matching the HTML prototype
-// ─────────────────────────────────────────────────────────────
-import { Animated } from 'react-native';
-import { useRef, useEffect } from 'react';
 import React from 'react';
 import { Text, StyleSheet, Platform, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import QuestDetailScreen from '../screens/QuestDetailScreen';
+import LessonDetailScreen from '../screens/LessonDetailScreen';
 
 import HomeScreen        from '../screens/HomeScreen';
 import FeedScreen        from '../screens/FeedScreen';
 import LeaderboardScreen from '../screens/LeaderboardScreen';
 import AIScreen          from '../screens/AIScreen';
 import ProfileScreen     from '../screens/ProfileScreen';
+import QuestScreen       from '../screens/QuestScreen';
 
 import { Colors, BorderRadius } from '../constants/theme';
 
-// ── Tab Param List (TypeScript type safety for navigation) ────
 export type RootTabParamList = {
   Home:        undefined;
   Feed:        undefined;
@@ -27,8 +24,19 @@ export type RootTabParamList = {
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
+const Stack = createStackNavigator();
 
-// ── Tab icon config ───────────────────────────────────────────
+function HomeStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="HomeMain" component={HomeScreen} />
+      <Stack.Screen name="Quests"   component={QuestScreen} />
+      <Stack.Screen name="QuestDetail" component={QuestDetailScreen} />
+      <Stack.Screen name="LessonDetail" component={LessonDetailScreen} />
+    </Stack.Navigator>
+  );
+}
+
 const TAB_CONFIG = {
   Home:        { emoji: '🏠', label: 'Home'      },
   Feed:        { emoji: '🌍', label: 'Feed'      },
@@ -37,15 +45,12 @@ const TAB_CONFIG = {
   Profile:     { emoji: '👤', label: 'Profile'   },
 } as const;
 
-// ─────────────────────────────────────────────────────────────
 export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
-
-          // ── Tab Bar Icon ─────────────────────────────────
           tabBarIcon: ({ focused }) => {
   const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
   const scale = useRef(new Animated.Value(1)).current;
@@ -72,27 +77,18 @@ export default function AppNavigator() {
           tabBarLabel: ({ focused }) => {
             const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
             return (
-              <Text
-                style={[
-                  styles.tabLabel,
-                  focused && styles.tabLabelActive,
-                ]}
-              >
+              <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
                 {config.label}
               </Text>
             );
           },
-
-          // ── Tab Bar Style ─────────────────────────────────
           tabBarStyle: styles.tabBar,
           tabBarItemStyle: styles.tabItem,
-
-          // Active/inactive colors (used as fallback)
           tabBarActiveTintColor:   Colors.spice,
           tabBarInactiveTintColor: Colors.textMuted,
         })}
       >
-        <Tab.Screen name="Home"        component={HomeScreen}        />
+        <Tab.Screen name="Home"        component={HomeStack}         />
         <Tab.Screen name="Feed"        component={FeedScreen}        />
         <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
         <Tab.Screen name="AI"          component={AIScreen}          />
@@ -102,7 +98,6 @@ export default function AppNavigator() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: 'rgba(14,14,22,0.97)',
@@ -111,24 +106,16 @@ const styles = StyleSheet.create({
     height: Platform.OS === 'ios' ? 82 : 64,
     paddingTop: 8,
     paddingBottom: Platform.OS === 'ios' ? 20 : 8,
-    // Subtle shadow on iOS
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 20,
   },
-  tabItem: {
-    paddingTop: 4,
-  },
-  tabEmoji: {
-    fontSize: 22,
-  },
-  tabEmojiActive: {
-    transform: [{ scale: 1.15 }],
-  },
+  tabItem:        { paddingTop: 4 },
+  tabEmoji:       { fontSize: 22 },
+  tabEmojiActive: { transform: [{ scale: 1.15 }] },
   activeIconWrap: {
-    // Top active indicator line (matches HTML prototype's ::before pseudo element)
     borderTopWidth: 3,
     borderTopColor: Colors.spice,
     borderRadius: BorderRadius.xs,
@@ -144,7 +131,5 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     marginTop: 2,
   },
-  tabLabelActive: {
-    color: Colors.spice,
-  },
+  tabLabelActive: { color: Colors.spice },
 });
