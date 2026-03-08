@@ -2,6 +2,8 @@
 // navigation/AppNavigator.tsx
 // Bottom tab navigator — 5 tabs matching the HTML prototype
 // ─────────────────────────────────────────────────────────────
+import { Animated } from 'react-native';
+import { useRef, useEffect } from 'react';
 import React from 'react';
 import { Text, StyleSheet, Platform, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -45,20 +47,26 @@ export default function AppNavigator() {
 
           // ── Tab Bar Icon ─────────────────────────────────
           tabBarIcon: ({ focused }) => {
-            const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
-            return (
-              <View style={focused ? styles.activeIconWrap : null}>
-                <Text
-                  style={[
-                    styles.tabEmoji,
-                    focused && styles.tabEmojiActive,
-                  ]}
-                >
-                  {config.emoji}
-                </Text>
-              </View>
-            );
-          },
+  const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: focused ? 1.2 : 1,
+      useNativeDriver: true,
+      tension: 180,
+      friction: 12,
+    }).start();
+  }, [focused]);
+
+  return (
+    <View style={focused ? styles.activeIconWrap : null}>
+      <Animated.Text style={[styles.tabEmoji, { transform: [{ scale }] }]}>
+        {config.emoji}
+      </Animated.Text>
+    </View>
+  );
+},
 
           // ── Tab Bar Label ─────────────────────────────────
           tabBarLabel: ({ focused }) => {
