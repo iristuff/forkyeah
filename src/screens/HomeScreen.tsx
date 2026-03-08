@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// screens/HomeScreen.tsx  —  STUB (Dev 2 owns this screen)
-// ─────────────────────────────────────────────────────────────
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { Colors, FontSize } from '../constants/theme';
@@ -22,5 +19,5 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   emoji: { fontSize: 48 },
   label: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.text },
-  sub:   { fontSize: FontSize.sm, color: Colors.textMuted },
+  sub: { fontSize: FontSize.sm, color: Colors.textMuted },
 });
