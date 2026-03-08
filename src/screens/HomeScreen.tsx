@@ -5,8 +5,10 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import { Colors, FontSize } from '../constants/theme';
 import { CURRENT_USER, DAILY_MISSION, LESSONS, QUESTS, POSTS } from '../constants/data';
+import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
+  const navigation = useNavigation<any>();
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -27,7 +29,7 @@ export default function HomeScreen() {
             </View>
           ))}
         </ScrollView>
-        <Text style={styles.sectionTitle}>⚔️ Quests</Text>
+        <Text style={styles.sectionTitle} onPress={() => navigation.navigate('Quests')}>⚔️ Quests</Text>
         {QUESTS.map(quest => (
           <View key={quest.id} style={styles.questCard}>
             <Text style={styles.questEmoji}>{quest.emoji}</Text>
@@ -37,8 +39,8 @@ export default function HomeScreen() {
               <View style={styles.progressBar}>
                 <View style={[styles.progressFill, { width: `${(quest.progress / quest.total) * 100}%`}]} />
               </View>
+              <Text style={styles.questMeta}>{quest.progress}/{quest.total} . ⭐️ {quest.xpReward} XP</Text>
             </View>
-            <Text style={styles.questMeta}>{quest.progress}/{quest.total} . ⭐️ {quest.xpReward} XP</Text>
           </View>
         ))}
         <Text style={styles.sectionTitle}>🍽️ Community Feed</Text>
@@ -109,6 +111,6 @@ const styles = StyleSheet.create({
   postName: { fontSize: 13, fontWeight:'800', color: Colors.text },
   postMeta: { fontSize: 11, color: Colors.textMuted },
   postDish: { fontSize: 18, fontWeight:'800', color: Colors.text },
-  postCaption: { fontSIze: 12, color: Colors.textMuted, lineHeight: 18 },
+  postCaption: { fontSize: 12, color: Colors.textMuted, lineHeight: 18 },
   postActions: { fontSize: 13, color: Colors.textMuted },
 });
