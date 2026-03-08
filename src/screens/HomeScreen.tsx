@@ -12,7 +12,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Text style={styles.label}>👋🏻 Hey {CURRENT_USER.name}!</Text>
+        <Text style={styles.label}>Hey {CURRENT_USER.name}!</Text>
         <Text style={styles.sub}>Level {CURRENT_USER.level} . 🔥 {CURRENT_USER.streak} day streak</Text>
         <View style={styles.missionCard}>
           <Text style={styles.missionFlag}>{DAILY_MISSION.flagEmoji}</Text>
