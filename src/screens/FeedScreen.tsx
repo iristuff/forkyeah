@@ -1,7 +1,9 @@
-// screens/FeedScreen.tsx  —  STUB (Dev 3 owns this screen)
+// screens/FeedScreen.tsx  
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { Colors, FontSize } from '../constants/theme';
+
+const FILTERS = ['All', 'Friends', '🇯🇵 Japanese', '🇮🇳 Indian', '🇮🇹 Italian', '🇲🇽 Mexican', '🇹🇭 Thai'];
 
 export default function FeedScreen() {
   return (
