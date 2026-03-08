@@ -52,15 +52,28 @@ export default function AppNavigator() {
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarIcon: ({ focused }) => {
-            const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
-            return (
-              <View style={focused ? styles.activeIconWrap : null}>
-                <Text style={[styles.tabEmoji, focused && styles.tabEmojiActive]}>
-                  {config.emoji}
-                </Text>
-              </View>
-            );
-          },
+  const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: focused ? 1.2 : 1,
+      useNativeDriver: true,
+      tension: 180,
+      friction: 12,
+    }).start();
+  }, [focused]);
+
+  return (
+    <View style={focused ? styles.activeIconWrap : null}>
+      <Animated.Text style={[styles.tabEmoji, { transform: [{ scale }] }]}>
+        {config.emoji}
+      </Animated.Text>
+    </View>
+  );
+},
+
+          // ── Tab Bar Label ─────────────────────────────────
           tabBarLabel: ({ focused }) => {
             const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
             return (
