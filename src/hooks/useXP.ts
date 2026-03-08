@@ -27,7 +27,7 @@ const XP_TABLE: number[] = [
   11800, // level 11
   14000, // level 12
   16500, // level 13
-  19000, // level 14  ← Erik is here (4820 XP in level 14 range → next 6500)
+  19000, // level 14  ← Miaa is here (4820 XP in level 14 range → next 6500)
   22000, // level 15
   25500, // level 16
   29500, // level 17

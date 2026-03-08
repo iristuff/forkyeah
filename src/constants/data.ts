@@ -9,8 +9,8 @@ import type {
 
 // ── Current User ──────────────────────────────────────────────
 export const CURRENT_USER: User = {
-  id: 'user_erik',
-  name: 'Erik',
+  id: 'user_miaa',
+  name: 'Miaa',
   emoji: '🧑‍🍳',
   level: 14,
   xp: 4820,
@@ -202,7 +202,7 @@ export const LEADERBOARD: LeaderboardEntry[] = [
   { id: 'user_luca',  name: 'Luca B.',   emoji: '👨‍🍳', xp: 9200,  streak: 17, rank: 4, isMe: false, subtitle: '🇮🇹 Italian Artisan' },
   { id: 'user_sofia', name: 'Sofia R.',  emoji: '👩‍🍳', xp: 7600,  streak: 22, rank: 5, isMe: false, subtitle: '🇪🇸 Spice Explorer' },
   { id: 'user_taro',  name: 'Taro K.',   emoji: '🧑',   xp: 6900,  streak: 14, rank: 6, isMe: false, subtitle: '🇯🇵 Ramen Wizard' },
-  { id: 'user_erik',  name: 'Erik (You)',emoji: '🧑‍🍳', xp: 4820,  streak: 21, rank: 7, isMe: true,  subtitle: '🇮🇳 Spice Sage' },
+  { id: 'user_miaa',  name: 'Miaa (You)',emoji: '🧑‍🍳', xp: 4820,  streak: 21, rank: 7, isMe: true,  subtitle: '🇮🇳 Spice Sage' },
   { id: 'user_maria', name: 'Maria K.',  emoji: '👩‍🍳', xp: 4200,  streak: 16, rank: 8, isMe: false, subtitle: '🇲🇽 Mole Master' },
 ];
 
@@ -243,7 +243,7 @@ export const INITIAL_MESSAGES: Message[] = [
   {
     id: 'msg_1',
     role: 'ai',
-    content: "Hey Chef Erik! 👋 I'm Saffron, your AI sous chef. I can analyze your dishes, suggest substitutions, and explain the cultural story behind every recipe. What are we cooking today? 🍳",
+    content: "Hey Chef Miaa! 👋 I'm Saffron, your AI sous chef. I can analyze your dishes, suggest substitutions, and explain the cultural story behind every recipe. What are we cooking today? 🍳",
     timestamp: '9:00 AM',
   },
   {
