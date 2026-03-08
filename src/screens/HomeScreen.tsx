@@ -17,6 +17,16 @@ export default function HomeScreen() {
           <Text style={styles.missionTitle}>{DAILY_MISSION.title}</Text>
           <Text style={styles.missionMeta}>⭐️ {DAILY_MISSION.xpReward} XP . ⏲ {DAILY_MISSION.durationMin} mins . 👤 {DAILY_MISSION.buddyName}</Text>
         </View>
+        <Text style={styles.sectionTitle}>📚 Lessons</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {LESSONS.map(lesson => (
+            <View key={lesson.id} style={styles.lessonCard}>
+              <Text style={styles.lessonEmoji}>{lesson.emoji}</Text>
+              <Text style={styles.lessonName}>{lesson.name}</Text>
+              <Text style={styles.lessonProgress}>{lesson.completedSteps}/{lesson.totalSteps} steps</Text>
+            </View>
+          ))}
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
@@ -47,4 +57,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textMuted,
   },
+  sectionTitle: { fontSize:18, fontWeight: '800', color: Colors.text, marginLeft: 16, marginTop: 16 },
+  lessonCard: { margin: 8, padding: 16, backgroundColor: '#1a0e06', borderRadius: 12, width: 130, gap: 4 },
+  lessonEmoji: { fontSize: 28 },
+  lessonName: { fontSize: 13, fontWeight: '700', color: Colors.text },
+  lessonProgress: { fontSize: 11, color: Colors.textMuted },
 });
