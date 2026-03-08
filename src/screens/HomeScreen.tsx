@@ -41,6 +41,21 @@ export default function HomeScreen() {
             <Text style={styles.questMeta}>{quest.progress}/{quest.total} . ⭐️ {quest.xpReward} XP</Text>
           </View>
         ))}
+        <Text style={styles.sectionTitle}>🍽️ Community Feed</Text>
+        {POSTS.map(post => (
+          <View key={post.id} style={styles.postCard}>
+            <View style={styles.postHeader}>
+              <Text style={styles.postAvatar}>{post.userEmoji}</Text>
+              <View>
+                <Text style={styles.postName}>{post.userName}</Text>
+                <Text style={styles.postMeta}>{post.flagEmoji} . {post.timeAgo}</Text>
+              </View>
+            </View>
+            <Text style={styles.postDish}>{post.dishEmoji} {post.dishName}</Text>
+            <Text style={styles.postCaption}>{post.caption}</Text>
+            <Text style={styles.postActions}>❤️ {post.likes} 💬 {post.comments}</Text>
+          </View>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -87,4 +102,13 @@ const styles = StyleSheet.create({
   progressBar: { height: 6, backgroundColor: '#2a1208', borderRadius: 10 },
   progressFill: { height: 6, backgroundColor: '#c45c1a', borderRadius: 10 },
   questMeta: { fontSize: 10, color: Colors.textMuted },
+
+  postCard: { margin: 16, marginTop: 8, backgroundColor: '#1a0e06', borderRadius: 12, padding: 14, gap: 8 },
+  postHeader: {flexDirection: 'row', alignItems:'center', gap: 10 },
+  postAvatar: { fontSize: 28 },
+  postName: { fontSize: 13, fontWeight:'800', color: Colors.text },
+  postMeta: { fontSize: 11, color: Colors.textMuted },
+  postDish: { fontSize: 18, fontWeight:'800', color: Colors.text },
+  postCaption: { fontSIze: 12, color: Colors.textMuted, lineHeight: 18 },
+  postActions: { fontSize: 13, color: Colors.textMuted },
 });
