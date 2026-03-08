@@ -5,14 +5,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import QuestDetailScreen from '../screens/QuestDetailScreen';
 import LessonDetailScreen from '../screens/LessonDetailScreen';
-
 import HomeScreen        from '../screens/HomeScreen';
 import FeedScreen        from '../screens/FeedScreen';
 import LeaderboardScreen from '../screens/LeaderboardScreen';
 import AIScreen          from '../screens/AIScreen';
 import ProfileScreen     from '../screens/ProfileScreen';
 import QuestScreen       from '../screens/QuestScreen';
-
 import { Colors, BorderRadius } from '../constants/theme';
 
 export type RootTabParamList = {
@@ -29,9 +27,9 @@ const Stack = createStackNavigator();
 function HomeStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="HomeMain" component={HomeScreen} />
-      <Stack.Screen name="Quests"   component={QuestScreen} />
-      <Stack.Screen name="QuestDetail" component={QuestDetailScreen} />
+      <Stack.Screen name="HomeMain"     component={HomeScreen} />
+      <Stack.Screen name="Quests"       component={QuestScreen} />
+      <Stack.Screen name="QuestDetail"  component={QuestDetailScreen} />
       <Stack.Screen name="LessonDetail" component={LessonDetailScreen} />
     </Stack.Navigator>
   );
@@ -52,28 +50,15 @@ export default function AppNavigator() {
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarIcon: ({ focused }) => {
-  const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
-  const scale = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.spring(scale, {
-      toValue: focused ? 1.2 : 1,
-      useNativeDriver: true,
-      tension: 180,
-      friction: 12,
-    }).start();
-  }, [focused]);
-
-  return (
-    <View style={focused ? styles.activeIconWrap : null}>
-      <Animated.Text style={[styles.tabEmoji, { transform: [{ scale }] }]}>
-        {config.emoji}
-      </Animated.Text>
-    </View>
-  );
-},
-
-          // ── Tab Bar Label ─────────────────────────────────
+            const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
+            return (
+              <View style={focused ? styles.activeIconWrap : null}>
+                <Text style={[styles.tabEmoji, focused && styles.tabEmojiActive]}>
+                  {config.emoji}
+                </Text>
+              </View>
+            );
+          },
           tabBarLabel: ({ focused }) => {
             const config = TAB_CONFIG[route.name as keyof typeof TAB_CONFIG];
             return (
