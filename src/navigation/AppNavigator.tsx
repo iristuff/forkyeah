@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import QuestDetailScreen from '../screens/QuestDetailScreen';
+import LessonDetailScreen from '../screens/LessonDetailScreen';
 
 import HomeScreen        from '../screens/HomeScreen';
 import FeedScreen        from '../screens/FeedScreen';
@@ -31,6 +32,7 @@ function HomeStack() {
       <Stack.Screen name="HomeMain" component={HomeScreen} />
       <Stack.Screen name="Quests"   component={QuestScreen} />
       <Stack.Screen name="QuestDetail" component={QuestDetailScreen} />
+      <Stack.Screen name="LessonDetail" component={LessonDetailScreen} />
     </Stack.Navigator>
   );
 }

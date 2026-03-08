@@ -2,7 +2,7 @@
 // screens/HomeScreen.tsx  —  STUB (Dev 2 owns this screen)
 // ─────────────────────────────────────────────────────────────
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Colors, FontSize } from '../constants/theme';
 import { CURRENT_USER, DAILY_MISSION, LESSONS, QUESTS, POSTS } from '../constants/data';
 import { useNavigation } from '@react-navigation/native';
@@ -22,14 +22,17 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>📚 Lessons</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {LESSONS.map(lesson => (
-            <View key={lesson.id} style={styles.lessonCard}>
+            <TouchableOpacity key={lesson.id} style={styles.lessonCard} onPress={() => navigation.navigate('LessonDetail', { lesson})}>
               <Text style={styles.lessonEmoji}>{lesson.emoji}</Text>
               <Text style={styles.lessonName}>{lesson.name}</Text>
               <Text style={styles.lessonProgress}>{lesson.completedSteps}/{lesson.totalSteps} steps</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
-        <Text style={styles.sectionTitle} onPress={() => navigation.navigate('Quests')}>⚔️ Quests</Text>
+        <TouchableOpacity style={styles.questsButton} onPress={() => navigation.navigate('Quests')}>
+          <Text style={styles.questsButtonText}>⚔️ Quests</Text>
+          <Text style={styles.questsButtonArrow}>See all →</Text>
+        </TouchableOpacity>
         {QUESTS.map(quest => (
           <View key={quest.id} style={styles.questCard}>
             <Text style={styles.questEmoji}>{quest.emoji}</Text>
@@ -90,7 +93,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
 
-  sectionTitle: { fontSize:18, fontWeight: '800', color: Colors.text, marginLeft: 16, marginTop: 16 },
+  sectionTitle: { fontSize: 28, fontWeight: '800', color: Colors.text, marginLeft: 16, marginTop: 16 },
   lessonCard: { margin: 8, padding: 16, backgroundColor: '#1a0e06', borderRadius: 12, width: 130, gap: 4 },
   lessonEmoji: { fontSize: 28 },
   lessonName: { fontSize: 13, fontWeight: '700', color: Colors.text },
@@ -113,4 +116,9 @@ const styles = StyleSheet.create({
   postDish: { fontSize: 18, fontWeight:'800', color: Colors.text },
   postCaption: { fontSize: 12, color: Colors.textMuted, lineHeight: 18 },
   postActions: { fontSize: 13, color: Colors.textMuted },
+
+  questsButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 16, marginRight: 16, marginTop: 16 },
+  questsButtonText: { fontSize: 20, fontWeight: '800', color: Colors.text },
+  questsButtonArrow: { fontSize: 13, color: '#c45c1a', fontWeight: '700' },
 });
+

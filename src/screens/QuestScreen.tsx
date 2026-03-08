@@ -3,6 +3,8 @@ import { View, Text, ScrollView, StyleSheet, SafeAreaView, ActivityIndicator, To
 import { Colors, FontSize } from '../constants/theme';
 import { supabase } from '../constants/supabase';
 import { useNavigation } from '@react-navigation/native';
+import { QUESTS } from '../constants/data';
+
 
 export default function QuestScreen() {
     const [quests, setQuests] = useState<any[]>([]);
@@ -12,7 +14,11 @@ export default function QuestScreen() {
     useEffect(() => {
         async function fetchQuests() {
             const { data } = await supabase.from('quests').select('*');
-            if (data) setQuests(data);
+            if (data && data.length > 0) {
+                setQuests(data);
+            } else{
+                setQuests(QUESTS);
+            }
             setLoading(false);
         }
         fetchQuests();
@@ -26,6 +32,9 @@ export default function QuestScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
       <ScrollView>
         <Text style={styles.title}>⚔️ Quests</Text>
 
@@ -58,7 +67,6 @@ export default function QuestScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.midnight },
   title: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.text, margin: 16 },
-  
   card: { margin: 16, marginTop: 8, backgroundColor: '#1a0e06', borderRadius: 16, padding: 16, gap: 10 },
   cardTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   cardEmoji: { fontSize: 32 },
@@ -69,8 +77,9 @@ const styles = StyleSheet.create({
   progressBar: { height: 8, backgroundColor: '#2a1208', borderRadius: 10 },
   progressFill: { height: 8, backgroundColor: '#c45c1a', borderRadius: 10 },
   cardProgress: { fontSize: 11, color: Colors.textMuted },
-
   summaryCard: { margin: 16, padding: 16, backgroundColor: '#1a0e06', borderRadius: 16, gap: 6 },
   summaryTitle: { fontSize: 16, fontWeight: '800', color: Colors.text },
   summaryStats: { fontSize: 13, color: Colors.textMuted },
+  back: { padding: 16 },
+  backText: { color: '#c45c1a', fontSize: 16, fontWeight: '700' },
 });
