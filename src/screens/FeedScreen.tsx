@@ -94,20 +94,7 @@ export default function FeedScreen() {
 
           {/* CV Analysis */}
           <CVScoreCard score={post.cvScore} compact={true} />
-          {/* <View style={styles.cvBox}>
-            <Text style={styles.cvTitle}>🤖 AI Vision Analysis</Text>
-            <View style={styles.cvScoresRow}>
-              {post.cvScore.map((s, i) => (
-                <View key={i} style={styles.cvScoreCol}>
-                  <Text style={styles.cvScoreLabel}>{s.label}</Text>
-                  <View style={styles.cvScoreTrack}>
-                    <View style={[styles.cvScoreFill, { width: `${s.score}%` as any, backgroundColor: s.color }]} />
-                  </View>
-                  <Text style={[styles.cvScoreNum, { color: s.color }]}>{s.score}%</Text>
-                </View>
-              ))}
-            </View>
-          </View> */}
+
 
           {/* Caption */}
           <Text style={styles.caption}>{post.caption}</Text>
