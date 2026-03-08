@@ -1,5 +1,5 @@
 // screens/AIScreen.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,49 +7,13 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  Animated,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
 } from 'react-native';
 import { Colors, FontSize } from '../constants/theme';
 import { sendMessage, Message } from '../services/gemini';
-
-function TypingIndicator() {
-  const dot1 = useRef(new Animated.Value(0)).current;
-  const dot2 = useRef(new Animated.Value(0)).current;
-  const dot3 = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const animate = (dot: Animated.Value, delay: number) =>
-        Animated.loop(
-            Animated.sequence([
-              Animated.delay(delay),
-              Animated.timing(dot, { toValue: -6, duration: 300, useNativeDriver: true }),
-              Animated.timing(dot, { toValue: 0, duration: 300, useNativeDriver: true }),
-              Animated.delay(600),
-            ])
-        ).start();
-
-    animate(dot1, 0);
-    animate(dot2, 150);
-    animate(dot3, 300);
-  }, []);
-
-  return (
-      <View style={styles.row}>
-        <Text style={styles.avatar}>🤖</Text>
-        <View style={styles.typingBubble}>
-          {[dot1, dot2, dot3].map((dot, i) => (
-              <Animated.View
-                  key={i}
-                  style={[styles.dot, { transform: [{ translateY: dot }] }]}
-              />
-          ))}
-        </View>
-      </View>
-  );
-}
 
 export default function AIScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -72,7 +36,7 @@ export default function AIScreen() {
     try {
       const reply = await sendMessage(newMessages);
       setMessages([...newMessages, { role: 'model', text: reply }]);
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+      flatListRef.current?.scrollToEnd({ animated: true });
     } catch (e) {
       console.error(e);
     } finally {
@@ -92,35 +56,31 @@ export default function AIScreen() {
             style={styles.flex}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
+          {/* Messages */}
           <FlatList
               ref={flatListRef}
               data={messages}
               keyExtractor={(_, i) => i.toString()}
               contentContainerStyle={styles.messageList}
-              onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
               renderItem={({ item }) => (
-                  <View style={[styles.row, item.role === 'user' && styles.rowReverse]}>
-                    <Text style={styles.avatar}>
-                      {item.role === 'user' ? '👤' : '🤖'}
-                    </Text>
-                    <View style={[
-                      styles.bubble,
-                      item.role === 'user' ? styles.userBubble : styles.modelBubble
+                  <View style={[
+                    styles.bubble,
+                    item.role === 'user' ? styles.userBubble : styles.modelBubble
+                  ]}>
+                    <Text style={[
+                      styles.bubbleText,
+                      item.role === 'user' ? styles.userText : styles.modelText
                     ]}>
-                      <Text style={[
-                        styles.bubbleText,
-                        item.role === 'user' ? styles.userText : styles.modelText
-                      ]}>
-                        {item.text}
-                      </Text>
-                    </View>
+                      {item.text}
+                    </Text>
                   </View>
               )}
               ListEmptyComponent={
                 <Text style={styles.emptyText}>Ask me anything about cooking!</Text>
               }
-              ListFooterComponent={loading ? <TypingIndicator /> : null}
           />
+
+          {loading && <ActivityIndicator color={Colors.text} style={styles.loader} />}
 
           {/* Input */}
           <View style={styles.inputRow}>
@@ -152,19 +112,15 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 16, borderBottomWidth: 1, borderColor: '#ffffff15' },
   emoji: { fontSize: 24 },
   title: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.text },
-  messageList: { padding: 16, gap: 12 },
-  row: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  rowReverse: { flexDirection: 'row-reverse' },
-  avatar: { fontSize: 24, marginBottom: 4 },
+  messageList: { padding: 16, gap: 8 },
   bubble: { padding: 12, borderRadius: 16, maxWidth: '75%' },
-  userBubble: { backgroundColor: '#007AFF', borderBottomRightRadius: 4 },
-  modelBubble: { backgroundColor: '#ffffff15', borderBottomLeftRadius: 4 },
+  userBubble: { backgroundColor: '#007AFF', alignSelf: 'flex-end' },
+  modelBubble: { backgroundColor: '#ffffff15', alignSelf: 'flex-start' },
   bubbleText: { fontSize: FontSize.sm, lineHeight: 20 },
   userText: { color: '#fff' },
   modelText: { color: Colors.text },
   emptyText: { textAlign: 'center', color: Colors.textMuted, marginTop: 40, fontSize: FontSize.sm },
-  typingBubble: { flexDirection: 'row', backgroundColor: '#ffffff15', padding: 12, borderRadius: 16, borderBottomLeftRadius: 4, gap: 4, alignItems: 'center' },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.textMuted },
+  loader: { padding: 8 },
   inputRow: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderColor: '#ffffff15' },
   input: { flex: 1, backgroundColor: '#ffffff10', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, color: Colors.text, fontSize: FontSize.sm },
   sendButton: { backgroundColor: '#007AFF', borderRadius: 20, paddingHorizontal: 16, justifyContent: 'center' },
