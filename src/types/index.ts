@@ -70,6 +70,8 @@ export interface Post {
   comments: number;
   liked: boolean;
   timeAgo: string;
+  imageUrl: string;
+
 }
 
 // ── Leaderboard ───────────────────────────────────────────────

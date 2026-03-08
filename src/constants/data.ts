@@ -136,6 +136,7 @@ export const POSTS: Post[] = [
     comments: 12,
     liked: true,
     timeAgo: '2h ago',
+    imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749604f7ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'post_2',
@@ -153,6 +154,7 @@ export const POSTS: Post[] = [
     comments: 28,
     liked: false,
     timeAgo: '4h ago',
+    imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749604f7ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'post_3',
@@ -170,6 +172,7 @@ export const POSTS: Post[] = [
     comments: 9,
     liked: false,
     timeAgo: '6h ago',
+    imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749604f7ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'post_4',
@@ -187,6 +190,7 @@ export const POSTS: Post[] = [
     comments: 14,
     liked: false,
     timeAgo: '8h ago',
+    imageUrl: 'https://images.unsplash.com/photo-1551024705-20e7788d8f3c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
   },
 ];
 
