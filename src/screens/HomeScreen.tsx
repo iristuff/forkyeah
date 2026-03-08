@@ -27,6 +27,20 @@ export default function HomeScreen() {
             </View>
           ))}
         </ScrollView>
+        <Text style={styles.sectionTitle}>⚔️ Quests</Text>
+        {QUESTS.map(quest => (
+          <View key={quest.id} style={styles.questCard}>
+            <Text style={styles.questEmoji}>{quest.emoji}</Text>
+            <View style={styles.questInfo}>
+              <Text style={styles.questName}>{quest.name}</Text>
+              <Text style={styles.questDesc}>{quest.description}</Text>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${(quest.progress / quest.total) * 100}%`}]} />
+              </View>
+            </View>
+            <Text style={styles.questMeta}>{quest.progress}/{quest.total} . ⭐️ {quest.xpReward} XP</Text>
+          </View>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -38,6 +52,7 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 48 },
   label: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.text },
   sub:   { fontSize: FontSize.sm, color: Colors.textMuted },
+
   missionCard: {
     margin: 16,
     padding: 20,
@@ -57,9 +72,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textMuted,
   },
+
   sectionTitle: { fontSize:18, fontWeight: '800', color: Colors.text, marginLeft: 16, marginTop: 16 },
   lessonCard: { margin: 8, padding: 16, backgroundColor: '#1a0e06', borderRadius: 12, width: 130, gap: 4 },
   lessonEmoji: { fontSize: 28 },
   lessonName: { fontSize: 13, fontWeight: '700', color: Colors.text },
   lessonProgress: { fontSize: 11, color: Colors.textMuted },
+
+  questCard: { flexDirection: 'row', margin: 16, marginTop: 8, backgroundColor: '#1a0e06', borderRadius: 12, padding: 14, gap: 12 },
+  questEmoji: { fontSize: 28 },
+  questInfo: { flex: 1, gap: 4 },
+  questName: { fontSize: 14, fontWeight: '800', color: Colors.text },
+  questDesc: { fontSize: 11, color: Colors.textMuted },
+  progressBar: { height: 6, backgroundColor: '#2a1208', borderRadius: 10 },
+  progressFill: { height: 6, backgroundColor: '#c45c1a', borderRadius: 10 },
+  questMeta: { fontSize: 10, color: Colors.textMuted },
 });
