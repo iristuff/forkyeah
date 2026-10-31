@@ -11,6 +11,11 @@ export interface ChefModel {
   streamChat(opts: { system: string; history: ChatTurn[]; signal: AbortSignal }): Promise<AsyncIterable<string>>;
 }
 
+export interface ScoreModel {
+  // Returns the model's parsed JSON answer (unvalidated). Rejects on provider failure or non-JSON output.
+  scoreDish(opts: { system: string; prompt: string; imageBase64: string; jsonSchema: unknown; signal: AbortSignal }): Promise<unknown>;
+}
+
 export const DEFAULT_MODEL = 'gemini-flash-latest';
 
 export class UpstreamError extends Error {
@@ -37,6 +42,37 @@ export function geminiChefModel(apiKey: string, model = DEFAULT_MODEL): ChefMode
       } catch (err) {
         const status = (err as { status?: number }).status;
         throw new UpstreamError((err as Error).message, status);
+      }
+    },
+  };
+}
+
+export function geminiScoreModel(apiKey: string, model = DEFAULT_MODEL): ScoreModel {
+  const ai = new GoogleGenAI({ apiKey });
+  return {
+    async scoreDish({ system, prompt, imageBase64, jsonSchema, signal }) {
+      let text: string | undefined;
+      try {
+        const res = await ai.models.generateContent({
+          model,
+          contents: [{ role: 'user', parts: [{ inlineData: { mimeType: 'image/jpeg', data: imageBase64 } }, { text: prompt }] }],
+          config: {
+            systemInstruction: system,
+            responseMimeType: 'application/json',
+            responseJsonSchema: jsonSchema,
+            temperature: 0.4,
+            abortSignal: signal,
+          },
+        });
+        text = res.text;
+      } catch (err) {
+        const status = (err as { status?: number }).status;
+        throw new UpstreamError((err as Error).message, status);
+      }
+      try {
+        return JSON.parse(text ?? '');
+      } catch {
+        throw new UpstreamError('Model returned non-JSON output');
       }
     },
   };

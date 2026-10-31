@@ -19,16 +19,19 @@ const checks = [
   { path: '/sw.js', type: 'javascript' },
   { path: '/icons/icon-512.png', type: 'image/png' },
   { path: '/icons/apple-touch-icon.png', type: 'image/png' },
+  // API functions must load: a POST with no Origin gets our own 403 JSON (no AI call, no rate-limit hit)
+  { path: '/api/chef', method: 'POST', status: 403, type: 'application/json', body: /"forbidden"/ },
+  { path: '/api/score-dish', method: 'POST', status: 403, type: 'application/json', body: /"forbidden"/ },
 ];
 
-async function get(url, attempt = 1) {
+async function get(url, method = 'GET', attempt = 1) {
   try {
-    return await fetch(url, { headers, redirect: 'follow' });
+    return await fetch(url, { method, headers, redirect: 'follow' });
   } catch (err) {
     // fresh deployments can take a moment to propagate
     if (attempt < 3) {
       await new Promise(r => setTimeout(r, 2000 * attempt));
-      return get(url, attempt + 1);
+      return get(url, method, attempt + 1);
     }
     throw err;
   }
@@ -36,10 +39,10 @@ async function get(url, attempt = 1) {
 
 let failed = 0;
 for (const c of checks) {
-  const res = await get(base + c.path);
+  const res = await get(base + c.path, c.method);
   const type = res.headers.get('content-type') ?? '';
   const problems = [];
-  if (res.status !== 200) problems.push(`status ${res.status}`);
+  if (res.status !== (c.status ?? 200)) problems.push(`status ${res.status}`);
   if (!type.includes(c.type)) problems.push(`content-type "${type}"`);
   if (c.body && !c.body.test(await res.text())) problems.push('unexpected body');
 
