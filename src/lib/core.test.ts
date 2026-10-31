@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { dayHash, daysBetween, localDay } from './dates';
-import { activeStreak, bumpStreak } from './streak';
+import { addDays, dayHash, daysBetween, localDay, weekdayIndex } from './dates';
+import { activeStreak, bumpStreak, streakWeek } from './streak';
 import { levelForXP, levelInfo, MAX_LEVEL, titleForLevel, XP_TABLE } from './xp';
 
 describe('dates', () => {
@@ -77,5 +77,34 @@ describe('streak', () => {
     expect(activeStreak(s, '2026-10-11')).toBe(5);
     expect(activeStreak(s, '2026-10-12')).toBe(0);
     expect(activeStreak({ count: 0, lastDay: null }, '2026-10-12')).toBe(0);
+  });
+});
+
+describe('week view', () => {
+  it('shifts days across month and year ends', () => {
+    expect(addDays('2026-01-31', 1)).toBe('2026-02-01');
+    expect(addDays('2027-01-01', -1)).toBe('2026-12-31');
+    expect(addDays('2026-03-29', 0)).toBe('2026-03-29');
+  });
+
+  it('indexes weekdays from Monday', () => {
+    expect(weekdayIndex('2026-10-26')).toBe(0); // Monday
+    expect(weekdayIndex('2026-11-01')).toBe(6); // Sunday
+  });
+
+  it('marks the streak days inside this week', () => {
+    // Friday Oct 30 2026, 4-day streak ending today → Tue..Fri cooked
+    const week = streakWeek({ count: 4, lastDay: '2026-10-30' }, '2026-10-30');
+    expect(week.map(d => d.day)[0]).toBe('2026-10-26');
+    expect(week.map(d => d.cooked)).toEqual([false, true, true, true, true, false, false]);
+    expect(week[4].isToday).toBe(true);
+    expect(week[5].isFuture).toBe(true);
+  });
+
+  it('keeps yesterday’s streak visible until today ends, and drops a broken one', () => {
+    expect(streakWeek({ count: 2, lastDay: '2026-10-29' }, '2026-10-30').map(d => d.cooked)).toEqual([
+      false, false, true, true, false, false, false,
+    ]);
+    expect(streakWeek({ count: 5, lastDay: '2026-10-27' }, '2026-10-30').every(d => !d.cooked)).toBe(true);
   });
 });

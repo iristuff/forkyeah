@@ -1,0 +1,42 @@
+.timer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+}
+
+.timer :global(.btn) {
+  width: auto;
+  min-height: 46px;
+}
+
+.time {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.finished {
+  background: var(--sun);
+  animation: buzz 500ms var(--ease-bounce);
+}
+
+.finished .time {
+  font-size: var(--fs-2xl);
+}
+
+@keyframes buzz {
+  30% {
+    transform: rotate(-2deg) scale(1.02);
+  }
+  60% {
+    transform: rotate(2deg);
+  }
+}

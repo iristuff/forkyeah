@@ -1,0 +1,132 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  margin-top: var(--space-lg);
+  padding: var(--space-lg) var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-2xl);
+  background: var(--cu-tint);
+  overflow: hidden;
+}
+
+.flag {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.name {
+  margin-top: 6px;
+  font-size: var(--fs-hero);
+}
+
+.count {
+  font-size: var(--fs-md);
+  color: var(--ink-2);
+}
+
+.pill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-md);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background: var(--card);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cu);
+}
+
+.art {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  animation: float 900ms var(--ease-out) both;
+}
+
+.story {
+  margin-top: var(--space-lg);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 62ch;
+}
+
+.h2 {
+  margin: var(--space-2xl) 0 var(--space-md);
+}
+
+.dishes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dish {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  transition: transform 150ms var(--ease-out);
+}
+
+.dish:active {
+  transform: scale(0.98);
+}
+
+.thumb {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--cu-tint);
+}
+
+.thumbDone {
+  background: var(--done-bg);
+  color: var(--done-ink);
+}
+
+.dishText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-sm);
+}
+
+.dishText b {
+  font-size: var(--fs-base);
+}
+
+.cta {
+  margin-top: var(--space-lg);
+}
+
+@keyframes float {
+  from {
+    transform: translateY(16px) rotate(-6deg);
+    opacity: 0;
+  }
+}

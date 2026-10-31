@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png', 'icons/apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'favicon.png', 'icons/apple-touch-icon.png'],
       manifest: {
         id: '/',
         name: 'Fork Yeah',
@@ -18,8 +18,8 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        theme_color: '#0E0E16',
-        background_color: '#0A0A12',
+        theme_color: '#FFFCF3',
+        background_color: '#FFFCF3',
         categories: ['food', 'education', 'lifestyle'],
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
