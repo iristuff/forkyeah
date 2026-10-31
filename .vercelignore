@@ -1,0 +1,13 @@
+# Keep local-only and AI-assistant files out of Vercel uploads
+.env*
+!.env.example
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+docs/plan.md
+PRODUCT.md
+DESIGN.md
+.impeccable/
+.idea/
+node_modules/
+dist/

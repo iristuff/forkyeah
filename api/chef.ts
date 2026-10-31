@@ -2,11 +2,11 @@
 //   data: {"text":"..."}            one per chunk
 //   event: error / data: {...}      if the model fails mid-stream
 //   data: [DONE]                    end of reply
-import { geminiChefModel, withRetry, type ChefModel } from './_lib/ai';
-import { clientIp, isAllowedOrigin, jsonError, readJson } from './_lib/http';
-import { buildChefSystemPrompt } from './_lib/prompts';
-import { defaultRateLimiter, type RateLimiter } from './_lib/rateLimit';
-import { CHEF_LIMITS, ChefRequestSchema } from './_lib/schemas';
+import { geminiChefModel, withRetry, type ChefModel } from './_lib/ai.js';
+import { clientIp, isAllowedOrigin, jsonError, readJson } from './_lib/http.js';
+import { buildChefSystemPrompt } from './_lib/prompts.js';
+import { defaultRateLimiter, type RateLimiter } from './_lib/rateLimit.js';
+import { CHEF_LIMITS, ChefRequestSchema } from './_lib/schemas.js';
 
 const TIMEOUT_MS = 25_000;
 

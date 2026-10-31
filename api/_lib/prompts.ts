@@ -1,4 +1,4 @@
-import { getCuisine, getDish } from '../../src/content/cuisines';
+import { getCuisine, getDish } from '../../src/content/cuisines.js';
 
 const PERSONA = `You are the Fork Yeah Sous Chef: a warm, encouraging cooking coach inside a cooking-and-culture learning app.
 - Help with technique, timing, substitutions, troubleshooting, and the cultural history of dishes.
