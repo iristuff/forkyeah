@@ -1,0 +1,23 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: 60dvh;
+  text-align: center;
+}
+
+.emoji {
+  font-size: 48px;
+}
+
+.title {
+  font-size: var(--fs-title);
+}
+
+.blurb {
+  max-width: 28ch;
+  color: var(--text-dim);
+  font-size: var(--fs-md);
+}
