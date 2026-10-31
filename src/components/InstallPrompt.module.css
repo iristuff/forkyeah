@@ -10,16 +10,20 @@
   max-width: 480px;
   margin: 0 auto;
   padding: var(--space-md);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--sun);
   border-radius: var(--radius-lg);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-  animation: rise 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: var(--shadow-float);
+  animation: rise 400ms var(--ease-out);
 }
 
 .icon {
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
-  border-radius: var(--radius-sm);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: var(--card);
 }
 
 .text {
@@ -28,17 +32,18 @@
   gap: 2px;
   min-width: 0;
   font-size: var(--fs-sm);
-  color: var(--text-dim);
+  color: var(--sun-ink);
 }
 
 .text strong {
-  font-size: var(--fs-md);
-  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--fs-base);
+  line-height: 1.2;
+  color: var(--ink);
 }
 
 .share {
   vertical-align: -2px;
-  color: var(--teal);
 }
 
 .actions {
@@ -49,23 +54,24 @@
 }
 
 .primary {
-  min-height: 36px;
+  min-height: var(--tap-min);
   padding: 0 var(--space-lg);
   border: 0;
   border-radius: var(--radius-full);
-  background: var(--spice);
+  background: var(--red);
   color: #fff;
   font-weight: 700;
   font-size: var(--fs-sm);
 }
 
 .close {
+  display: grid;
+  place-items: center;
   width: var(--tap-min);
   height: var(--tap-min);
   border: 0;
   background: transparent;
-  color: var(--text-muted);
-  font-size: var(--fs-md);
+  color: var(--sun-ink);
 }
 
 @keyframes rise {

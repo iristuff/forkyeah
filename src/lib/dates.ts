@@ -24,3 +24,16 @@ export function dayHash(day: string): number {
   for (const ch of day) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return h;
 }
+
+// Shift a 'YYYY-MM-DD' day by n calendar days (UTC math, DST-safe)
+export function addDays(day: string, n: number): string {
+  const [y, m, d] = day.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d + n));
+  return `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, '0')}-${String(t.getUTCDate()).padStart(2, '0')}`;
+}
+
+// Monday-first index of the week (Mon = 0 … Sun = 6)
+export function weekdayIndex(day: string): number {
+  const [y, m, d] = day.split('-').map(Number);
+  return (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;
+}

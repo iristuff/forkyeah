@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { isIOS, isStandalone, readFlag, writeFlag } from '../lib/platform';
+import { Icon } from './Icon';
+import { Mascot } from './Mascot';
 import styles from './InstallPrompt.module.css';
 
 // Chrome/Android fire this before showing their own install UI
@@ -53,12 +55,14 @@ export function InstallPrompt() {
 
   return (
     <aside className={styles.banner} role="dialog" aria-label="Install Fork Yeah">
-      <img className={styles.icon} src="/icons/icon-192.png" alt="" width={40} height={40} />
+      <span className={styles.icon}>
+        <Mascot size={44} />
+      </span>
       <div className={styles.text}>
         <strong>Add Fork Yeah to your home screen</strong>
         {showIOSHint ? (
           <span>
-            Tap <ShareIcon /> Share, then “Add to Home Screen”. Your progress lives in the app, so install before you start cooking.
+            Tap <Icon name="share" size={14} className={styles.share} /> Share, then “Add to Home Screen”. Your progress lives in the app, so install before you start cooking.
           </span>
         ) : (
           <span>Full screen, works offline, keeps your progress safe.</span>
@@ -71,24 +75,9 @@ export function InstallPrompt() {
           </button>
         )}
         <button className={styles.close} onClick={dismiss} aria-label="Dismiss">
-          ✕
+          <Icon name="close" size={20} />
         </button>
       </div>
     </aside>
-  );
-}
-
-function ShareIcon() {
-  return (
-    <svg className={styles.share} viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-      <path
-        d="M12 3v12M7 8l5-5 5 5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

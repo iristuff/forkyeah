@@ -1,0 +1,142 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--safe-top) + var(--space-lg)) var(--space-xl) calc(var(--safe-bottom) + var(--space-xl));
+  background: var(--sun);
+  animation: fade 250ms var(--ease-out);
+}
+
+.sheet {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  animation: rise 450ms var(--ease-out);
+}
+
+.mascot {
+  animation: hooray 700ms var(--ease-bounce) both;
+}
+
+.title {
+  font-size: var(--fs-hero);
+  margin-top: var(--space-md);
+}
+
+.detail {
+  margin: var(--space-xs) 0 var(--space-sm);
+  color: var(--sun-ink);
+}
+
+.total {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  margin-bottom: var(--space-lg);
+}
+
+/* Confetti falls once from the top of the screen */
+.confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti i {
+  --x: calc(var(--i) * 5.5%);
+  position: absolute;
+  top: -20px;
+  left: var(--x);
+  width: 10px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--tomato);
+  animation: fall 1800ms var(--ease-out) calc(var(--i) * 40ms) both;
+}
+
+.confetti i:nth-child(4n + 1) {
+  background: var(--blue);
+  border-radius: 50%;
+  height: 10px;
+}
+
+.confetti i:nth-child(4n + 2) {
+  background: var(--green);
+}
+
+.confetti i:nth-child(4n + 3) {
+  background: var(--pink);
+  border-radius: 50%;
+  height: 10px;
+}
+
+.toast {
+  position: fixed;
+  top: calc(var(--safe-top) + var(--space-md));
+  left: 50%;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 6px 16px 6px 8px;
+  border-radius: var(--radius-full);
+  background: var(--card);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  box-shadow: var(--shadow-float);
+  transform: translateX(-50%);
+  animation: pop 1600ms var(--ease-out) both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(40px);
+  }
+}
+
+@keyframes hooray {
+  0% {
+    transform: scale(0.4) rotate(-12deg);
+  }
+  60% {
+    transform: scale(1.08) rotate(4deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(0) rotate(0);
+  }
+  to {
+    transform: translateY(105dvh) rotate(540deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -12px) scale(0.9);
+  }
+  15%,
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}

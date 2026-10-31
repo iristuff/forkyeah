@@ -5,62 +5,45 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   height: calc(var(--tab-bar-height) + var(--safe-bottom));
-  padding-bottom: var(--safe-bottom);
-  /* keep tabs under the 560px content column on tablets/desktop */
-  padding-inline: max(0px, calc((100% - 560px) / 2));
-  background: rgba(14, 14, 22, 0.94);
-  border-top: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  /* Full-width bar, tabs kept to the content column on wide screens */
+  padding: 6px max(4px, calc((100% - 560px) / 2)) var(--safe-bottom);
+  background: var(--card);
+  border-top: 1px solid var(--line);
 }
 
 .tab {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
   min-height: var(--tap-min);
-  color: var(--text-muted);
+  color: var(--tab-dim);
 }
 
-/* Top indicator line on the active tab */
-.tab::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 28px;
-  height: 3px;
-  border-radius: 0 0 var(--radius-xs) var(--radius-xs);
-  background: var(--spice);
-  transform: translateX(-50%) scaleX(0);
-  transition: transform 200ms ease;
-}
-
-.emoji {
-  font-size: 22px;
-  line-height: 1;
-  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+.pill {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  transition: background-color 200ms var(--ease-out), transform 300ms var(--ease-bounce);
 }
 
 .label {
-  font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
 }
 
 .active {
-  color: var(--spice);
+  color: var(--red-text);
 }
 
-.active::before {
-  transform: translateX(-50%) scaleX(1);
+.active .pill {
+  background: var(--sun);
+  transform: translateY(-1px);
 }
 
-.active .emoji {
-  transform: scale(1.15);
+.tab:active .pill {
+  transform: scale(0.9);
 }

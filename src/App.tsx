@@ -1,10 +1,12 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import { Layout } from './components/Layout';
+import { FocusLayout, Layout } from './components/Layout';
 import Home from './routes/Home';
 import Passport from './routes/Passport';
 import Ranks from './routes/Ranks';
 import Chef from './routes/Chef';
 import Profile from './routes/Profile';
+import Cuisine from './routes/Cuisine';
+import Cook from './routes/Cook';
 
 const router = createBrowserRouter([
   {
@@ -15,8 +17,13 @@ const router = createBrowserRouter([
       { path: '/ranks', element: <Ranks /> },
       { path: '/chef', element: <Chef /> },
       { path: '/profile', element: <Profile /> },
+      { path: '/cuisine/:cuisineId', element: <Cuisine /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
+  },
+  {
+    element: <FocusLayout />,
+    children: [{ path: '/cook/:dishId', element: <Cook /> }],
   },
 ]);
 

@@ -1,35 +1,40 @@
-/* Design tokens — ported from the Expo app's src/constants/theme.ts */
+/* Design tokens: the "Sunny" theme. Warm white page, sunny yellow highlights,
+   tomato red actions, and confetti colours that tag each cuisine. */
 :root {
   /* Brand */
-  --spice: #e8532a;
-  --turmeric: #f5a623;
-  --saffron: #ffd166;
-  --basil: #2d9e6b;
+  --tomato: #e8452c; /* logo and accents */
+  --red: #d93a20; /* buttons with white text (4.6:1) */
+  --red-edge: #b0301a; /* pressed edge under red buttons */
+  --red-text: #c2361f; /* XP, active states, red text on light grounds */
+  --sun: #ffe27a;
+  --sun-soft: #fff1bf;
+  --sun-ink: #5c4510; /* text on yellow */
 
-  /* Accents */
-  --gold: #ffd166;
-  --teal: #4ecdc4;
-  --pink: #ff6b9d;
-  --purple: #a855f7;
+  /* Confetti accents */
+  --blue: #3ba3e0;
+  --green: #2fb27a;
+  --pink: #ff7eb6;
+  --gold: #ffb627;
 
-  /* Backgrounds */
-  --bg: #0a0a12;
-  --midnight: #0e0e16;
-  --surface: #171723;
-  --surface-2: #1f1f2e;
-  --surface-3: #272738;
-  --border: rgba(255, 255, 255, 0.07);
+  /* Grounds */
+  --page: #fffcf3;
+  --card: #ffffff;
+  --sand: #f3ebd8; /* empty tracks, inactive fills */
+  --line: #f0e6cf;
+  --line-strong: #eadfc8;
+  --locked: #b9aa95;
+
+  /* Status */
+  --done-bg: #d7f2e3;
+  --done-ink: #1d6b48;
+  --alert-bg: #ffe0d8;
+  --alert-ink: #8a2412;
 
   /* Text */
-  --text: #f5f0e8;
-  --text-dim: rgba(245, 240, 232, 0.5);
-  --text-muted: rgba(245, 240, 232, 0.28);
-
-  /* Pill / tint backgrounds */
-  --spice-tint: rgba(232, 83, 42, 0.18);
-  --gold-tint: rgba(255, 209, 102, 0.15);
-  --basil-tint: rgba(45, 158, 107, 0.15);
-  --teal-tint: rgba(78, 205, 196, 0.15);
+  --ink: #2a1a14;
+  --ink-2: #5c4a40;
+  --dim: #7a6a60;
+  --tab-dim: #75665c;
 
   /* Spacing */
   --space-xs: 4px;
@@ -41,30 +46,37 @@
   --space-3xl: 32px;
 
   /* Type */
-  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-display: ui-serif, 'New York', Georgia, serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
-  --fs-xxs: 10px;
-  --fs-xs: 11px;
-  --fs-sm: 12px;
+  --font-body: 'Rethink Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Baloo 2 Variable', 'Rethink Sans Variable', system-ui, sans-serif;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
   --fs-md: 14px;
   --fs-base: 16px;
   --fs-lg: 18px;
   --fs-xl: 20px;
-  --fs-2xl: 24px;
-  --fs-title: 28px;
-  --fs-hero: 32px;
+  --fs-2xl: 26px;
+  --fs-title: 32px;
+  --fs-hero: 40px;
 
   /* Radius */
-  --radius-xs: 6px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 30px;
   --radius-full: 999px;
 
+  /* Depth */
+  --shadow-card: 0 6px 18px -10px rgba(80, 50, 0, 0.3);
+  --shadow-soft: 0 2px 8px -4px rgba(80, 50, 0, 0.25);
+  --shadow-float: 0 12px 32px -12px rgba(80, 50, 0, 0.4);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
   /* Layout */
-  --tab-bar-height: 64px;
+  --tab-bar-height: 72px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --tap-min: 44px;

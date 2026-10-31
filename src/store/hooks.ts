@@ -5,7 +5,7 @@ import { useGame } from './gameStore';
 import { CUISINES, getDish } from '../content/cuisines';
 import { cuisineProgress, dailyMission, dishProgress, questStatus } from '../lib/game';
 import { buildLeaderboard } from '../lib/leaderboard';
-import { activeStreak } from '../lib/streak';
+import { activeStreak, streakWeek } from '../lib/streak';
 import { localDay } from '../lib/dates';
 import { levelInfo } from '../lib/xp';
 
@@ -24,6 +24,12 @@ export function useLevel() {
 export function useStreak() {
   const streak = useGame(s => s.progress.streak);
   return activeStreak(streak, today());
+}
+
+export function useStreakWeek() {
+  const streak = useGame(s => s.progress.streak);
+  const day = today();
+  return useMemo(() => streakWeek(streak, day), [streak, day]);
 }
 
 export function useDailyMission() {

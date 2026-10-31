@@ -1,0 +1,90 @@
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: var(--space-xl) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 60px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.me {
+  background: var(--sun);
+  animation: glow 900ms var(--ease-out);
+}
+
+.rank {
+  width: 24px;
+  flex: none;
+  text-align: center;
+  font-weight: 800;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.top {
+  color: var(--red-text);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-lg);
+  overflow: hidden;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.who span {
+  overflow: hidden;
+  font-size: var(--fs-xs);
+  color: var(--dim);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.me .who span {
+  color: var(--sun-ink);
+}
+
+.row > .num {
+  font-weight: 700;
+}
+
+.gap {
+  padding: 2px;
+  text-align: center;
+  color: var(--locked);
+}
+
+.chase {
+  margin-top: var(--space-lg);
+  text-align: center;
+  font-size: var(--fs-md);
+  color: var(--dim);
+}
+
+@keyframes glow {
+  from {
+    transform: scale(0.97);
+  }
+}
