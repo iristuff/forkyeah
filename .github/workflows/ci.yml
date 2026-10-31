@@ -24,7 +24,7 @@ env:
 
 jobs:
   verify:
-    name: Verify (types, tests, build, PWA, secrets)
+    name: verify # required status check in branch protection — keep this name stable
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
