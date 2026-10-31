@@ -31,7 +31,8 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+.env*
+!.env.example
 
 # typescript
 *.tsbuildinfo
@@ -39,3 +40,20 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# IDE
+.idea/
+
+# AI assistant files (kept local only)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+docs/plan.md
+AGENTS.md
+.cursor/
+.cursorrules
+.windsurfrules
+.github/copilot-instructions.md
+PRODUCT.md
+DESIGN.md
+.impeccable/
