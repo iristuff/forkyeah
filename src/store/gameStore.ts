@@ -2,19 +2,19 @@
 // persisted) so screens can animate XP gains, level-ups and stamps.
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { ChatMessage, CVScore, GameEvent, Profile, Progress } from '../types';
-import { addChatMessage, completeStep, emptyProgress, recordScore, type Result } from '../lib/game';
-import { fromBackup, isProgress, toBackup } from '../lib/progressSchema';
+import type { ChatMessage, GameEvent, Profile, Progress } from '../types';
+import { addChatMessage, completeStep, emptyProgress, type Result } from '../lib/game';
+import { dropRetiredFields, fromBackup, isProgress, toBackup } from '../lib/progressSchema';
 import { localStorageRepo, STORAGE_KEY, type ProgressRepo } from './progressRepo';
 
 // Bump when the Progress shape changes, and handle the old version in `migrate`
-export const STORE_VERSION = 1;
+// v2: photo scoring removed (dishes[].bestScore, 'ai-critic' quest)
+export const STORE_VERSION = 2;
 
 export interface GameState {
   progress: Progress;
   lastEvents: GameEvent[];
   completeStep: (dishId: string, stepIdx: number, now?: Date) => GameEvent[];
-  recordScore: (dishId: string, score: CVScore, now?: Date) => GameEvent[];
   addChatMessage: (message: Omit<ChatMessage, 'id' | 'at'> & Partial<Pick<ChatMessage, 'id' | 'at'>>) => void;
   clearChat: () => void;
   updateProfile: (profile: Partial<Profile>) => void;
@@ -38,8 +38,6 @@ export function createGameStore(repo: ProgressRepo = localStorageRepo) {
           lastEvents: [],
 
           completeStep: (dishId, stepIdx, now = new Date()) => apply(completeStep(get().progress, dishId, stepIdx, now)),
-
-          recordScore: (dishId, score, now = new Date()) => apply(recordScore(get().progress, dishId, score, now)),
 
           addChatMessage: message =>
             set(s => ({
@@ -76,8 +74,10 @@ export function createGameStore(repo: ProgressRepo = localStorageRepo) {
         version: STORE_VERSION,
         storage: createJSONStorage(() => repo),
         partialize: s => ({ progress: s.progress }),
-        // No older versions exist yet. When STORE_VERSION goes to 2, transform v1 data here.
-        migrate: persisted => persisted as { progress: Progress },
+        migrate: persisted => {
+          const progress = (persisted as { progress?: unknown } | undefined)?.progress;
+          return { progress: dropRetiredFields(progress) as Progress };
+        },
         // Never trust stored data blindly: fill new fields, and if it's corrupted,
         // keep a copy for recovery and start fresh instead of crashing the app.
         merge: (persisted, current) => {

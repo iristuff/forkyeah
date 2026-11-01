@@ -87,7 +87,7 @@ export default function Cook() {
         <div className={`${styles.body} ${styles.finished}`}>
           <Mascot size={160} party />
           <h1>{dish.name} is ready!</h1>
-          <p className="dim">Plate it up and enjoy. Photo scoring for bonus XP is coming soon.</p>
+          <p className="dim">Plate it up and enjoy.</p>
         </div>
         <div className={styles.foot}>
           <Link to={`/cuisine/${dish.cuisineId}`} className="btn">

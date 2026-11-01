@@ -51,16 +51,6 @@ export const QUESTS: QuestDef[] = [
     progress: p => Object.keys(p.stamps).length,
   },
   {
-    id: 'ai-critic',
-    name: 'AI Chef Critic',
-    description: 'Score 90+ on a dish photo',
-    emoji: '📸',
-    total: 1,
-    xpReward: 750,
-    colorVariant: 'green',
-    progress: p => (Object.values(p.dishes).some(d => (d.bestScore?.overall ?? 0) >= 90) ? 1 : 0),
-  },
-  {
     id: 'week-streak',
     name: 'On Fire',
     description: 'Cook 7 days in a row',

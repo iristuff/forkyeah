@@ -11,7 +11,8 @@ export interface ChefModel {
   streamChat(opts: { system: string; history: ChatTurn[]; signal: AbortSignal }): Promise<AsyncIterable<string>>;
 }
 
-export const DEFAULT_MODEL = 'gemini-flash-latest';
+// Flash-Lite: on the free tier the full Flash models are often overloaded (503) or take 15-40s
+export const DEFAULT_MODEL = 'gemini-flash-lite-latest';
 
 export class UpstreamError extends Error {
   constructor(message: string, readonly status?: number) {

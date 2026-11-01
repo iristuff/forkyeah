@@ -81,6 +81,18 @@ describe('backup import/export', () => {
     expect(result.ok && result.progress.chat).toEqual([]);
   });
 
+  it('drops photo-scoring data from older backups', () => {
+    const at = now.toISOString();
+    const old = {
+      ...emptyProgress(),
+      dishes: { oyakodon: { stepsDone: [0], bestScore: { plating: 90, technique: 90, colorBalance: 90, portioning: 90, overall: 90 } } },
+      quests: { 'ai-critic': at, 'first-stamp': at },
+    };
+    const result = fromBackup(JSON.stringify({ format: 'forkyeah-backup', version: 1, progress: old }));
+    expect(result.ok && result.progress.dishes.oyakodon).toEqual({ stepsDone: [0] });
+    expect(result.ok && result.progress.quests).toEqual({ 'first-stamp': at });
+  });
+
   it('validates nested fields', () => {
     expect(isProgress(emptyProgress())).toBe(true);
     expect(isProgress({ ...emptyProgress(), streak: { count: 1, lastDay: 'yesterday' } })).toBe(false);

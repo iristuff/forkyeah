@@ -1,6 +1,6 @@
 // Validation for Progress coming from outside the app (backup import, or
 // corrupted storage). Hand-written to keep zod out of the client bundle.
-import type { ChatMessage, CVScore, DishProgress, Progress } from '../types';
+import type { ChatMessage, DishProgress, Progress } from '../types';
 import { emptyProgress } from './game';
 
 export const BACKUP_FORMAT = 'forkyeah-backup';
@@ -12,17 +12,12 @@ const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFin
 const isDay = (v: unknown): v is string => isStr(v) && /^\d{4}-\d{2}-\d{2}$/.test(v);
 const isISO = (v: unknown): v is string => isStr(v) && !Number.isNaN(Date.parse(v));
 
-function isScore(v: unknown): v is CVScore {
-  return isObj(v) && ['plating', 'technique', 'colorBalance', 'portioning', 'overall'].every(k => isNum(v[k]));
-}
-
 function isDishProgress(v: unknown): v is DishProgress {
   return (
     isObj(v) &&
     Array.isArray(v.stepsDone) &&
     v.stepsDone.every(n => Number.isInteger(n) && (n as number) >= 0) &&
-    (v.completedAt === undefined || isISO(v.completedAt)) &&
-    (v.bestScore === undefined || isScore(v.bestScore))
+    (v.completedAt === undefined || isISO(v.completedAt))
   );
 }
 
@@ -47,6 +42,26 @@ export function isProgress(v: unknown): v is Progress {
   );
 }
 
+// Fields from removed features, stripped from saved progress (store migrate) and old backups
+export function dropRetiredFields(v: unknown): unknown {
+  if (!isObj(v)) return v;
+  const out: Record<string, unknown> = { ...v };
+  if (isObj(v.dishes)) {
+    out.dishes = Object.fromEntries(
+      Object.entries(v.dishes).map(([id, d]) => {
+        if (!isObj(d)) return [id, d];
+        const { bestScore: _, ...rest } = d; // photo scoring, removed in store v2
+        return [id, rest];
+      }),
+    );
+  }
+  if (isObj(v.quests)) {
+    const { 'ai-critic': _, ...quests } = v.quests;
+    out.quests = quests;
+  }
+  return out;
+}
+
 // ── Backup file (export / import) ─────────────────────────────
 export function toBackup(p: Progress, now: Date): string {
   return JSON.stringify({ format: BACKUP_FORMAT, version: BACKUP_VERSION, exportedAt: now.toISOString(), progress: p }, null, 2);
@@ -68,7 +83,8 @@ export function fromBackup(text: string): ImportResult {
     return { ok: false, error: 'This backup is from a newer version of Fork Yeah. Update the app and try again.' };
   }
   // Fill any fields added since the backup was made, then validate
-  const progress = { ...emptyProgress(), ...(isObj(data.progress) ? data.progress : {}) };
+  const legacy = dropRetiredFields(data.progress);
+  const progress = { ...emptyProgress(), ...(isObj(legacy) ? legacy : {}) };
   if (!isProgress(progress)) return { ok: false, error: 'This backup is damaged and can’t be restored.' };
   return { ok: true, progress };
 }

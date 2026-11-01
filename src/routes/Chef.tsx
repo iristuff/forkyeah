@@ -110,18 +110,6 @@ export default function Chef() {
           </div>
         )}
 
-        <div className={styles.score}>
-          <span className={styles.scoreArt}>
-            <Mascot size={44} party />
-          </span>
-          <div>
-            <b>Done cooking?</b>
-            <p className="dim">Plate scoring from a photo is coming soon, with bonus XP.</p>
-          </div>
-          <span className={styles.scoreIcon} aria-hidden="true">
-            <Icon name="camera" size={20} />
-          </span>
-        </div>
         <div ref={end} />
       </div>
 

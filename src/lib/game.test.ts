@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { GameEvent, Progress } from '../types';
 import { CUISINES, getCuisine, getDish } from '../content/cuisines';
 import {
-  completeStep, cuisineProgress, dailyMission, emptyProgress, MISSION_XP, recordScore, STAMP_XP, STEP_XP, questStatus,
+  completeStep, cuisineProgress, dailyMission, emptyProgress, MISSION_XP, STAMP_XP, STEP_XP, questStatus,
   addChatMessage, CHAT_HISTORY_LIMIT,
 } from './game';
 import { localDay } from './dates';
@@ -22,7 +22,6 @@ function cook(p: Progress, dishId: string, now = DAY1) {
 }
 
 const types = (events: GameEvent[]) => events.map(e => e.type);
-const xpFrom = (events: GameEvent[]) => events.reduce((sum, e) => (e.type === 'xp' ? sum + e.amount : sum), 0);
 
 describe('completeStep', () => {
   it('awards step XP, starts the streak and records the step', () => {
@@ -106,31 +105,6 @@ describe('daily mission', () => {
     const other = CUISINES.flatMap(c => c.dishes).find(d => d.id !== mission.id)!;
     const { events } = cook(emptyProgress(), other.id);
     expect(types(events)).not.toContain('mission-complete');
-  });
-});
-
-describe('recordScore', () => {
-  const score = (overall: number) => ({ plating: overall, technique: overall, colorBalance: overall, portioning: overall, overall });
-
-  it('pays only the improvement over your best, so re-uploads cannot farm XP', () => {
-    let r = recordScore(emptyProgress(), 'oyakodon', score(70), DAY1);
-    expect(xpFrom(r.events)).toBe(70);
-    r = recordScore(r.progress, 'oyakodon', score(60), DAY1);
-    expect(xpFrom(r.events)).toBe(0);
-    expect(r.progress.dishes.oyakodon.bestScore!.overall).toBe(70);
-    r = recordScore(r.progress, 'oyakodon', score(85), DAY1);
-    expect(xpFrom(r.events)).toBe(15);
-  });
-
-  it('clamps out-of-range scores from the API', () => {
-    const r = recordScore(emptyProgress(), 'oyakodon', { plating: 140, technique: -5, colorBalance: NaN, portioning: 50.6, overall: 101 }, DAY1);
-    expect(r.progress.dishes.oyakodon.bestScore).toEqual({ plating: 100, technique: 0, colorBalance: 0, portioning: 51, overall: 100 });
-  });
-
-  it('completes the AI Chef Critic quest at 90+', () => {
-    const r = recordScore(emptyProgress(), 'green-curry', score(92), DAY1);
-    expect(r.progress.quests['ai-critic']).toBeDefined();
-    expect(r.events).toContainEqual({ type: 'quest-complete', questId: 'ai-critic' });
   });
 });
 

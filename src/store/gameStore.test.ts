@@ -35,6 +35,23 @@ describe('game store', () => {
     expect(JSON.parse(repo.dump()[`${STORAGE_KEY}:corrupt`])).toEqual(corrupt.state.progress);
   });
 
+  it('migrates v1 saves by dropping photo-scoring data', async () => {
+    const at = NOW.toISOString();
+    const v1 = {
+      ...emptyProgress(),
+      xp: 500,
+      dishes: { oyakodon: { stepsDone: [0], bestScore: { plating: 80, technique: 80, colorBalance: 80, portioning: 80, overall: 80 } } },
+      quests: { 'ai-critic': at },
+    };
+    const repo = memoryRepo({ [STORAGE_KEY]: JSON.stringify({ state: { progress: v1 }, version: 1 }) });
+    const store = createGameStore(repo);
+    await store.persist.rehydrate();
+    const { progress } = store.getState();
+    expect(progress.xp).toBe(500);
+    expect(progress.dishes.oyakodon).toEqual({ stepsDone: [0] });
+    expect(progress.quests).toEqual({});
+  });
+
   it('exports and imports a backup', () => {
     const a = createGameStore(memoryRepo());
     a.getState().completeStep('esquites', 0, NOW);
