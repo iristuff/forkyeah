@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Progress } from '../types';
 import { authErrorMessage, fromCloudProgress, sameProgress, toCloudProgress } from './cloudDoc';
 import { CHAT_HISTORY_LIMIT, emptyProgress } from './game';
-import { mergeProgress } from './mergeProgress';
+import { mergeProgress, nameForAccount, withAccountName } from './mergeProgress';
 
 const T1 = '2026-10-01T10:00:00.000Z';
 const T2 = '2026-10-02T10:00:00.000Z';
@@ -63,6 +63,23 @@ describe('mergeProgress', () => {
     expect(m.chat.at(-1)!.id).toBe('b');
     const many = Array.from({ length: CHAT_HISTORY_LIMIT }, (_, i) => msg(`m${i}`, new Date(Date.parse(T1) + i * 1000).toISOString()));
     expect(mergeProgress(p({ chat: many }), p({ chat: [msg('new', T2)] })).chat).toHaveLength(CHAT_HISTORY_LIMIT);
+  });
+});
+
+describe('account name', () => {
+  it('uses the first name, or a cleaned-up email', () => {
+    expect(nameForAccount({ displayName: 'Iris Le', email: 'iris@example.com' })).toBe('Iris');
+    expect(nameForAccount({ displayName: null, email: 'iris.le42@example.com' })).toBe('Iris');
+    expect(nameForAccount({ displayName: null, email: 'MARIA@example.com' })).toBe('Maria');
+    expect(nameForAccount({ displayName: '  ', email: '1234@example.com' })).toBeNull();
+    expect(nameForAccount({ displayName: null, email: null })).toBeNull();
+  });
+
+  it('only replaces the default name', () => {
+    const user = { displayName: 'Iris Le', email: null };
+    expect(withAccountName(emptyProgress(), user).profile.name).toBe('Iris');
+    const named = p({ profile: { name: 'Chef Bao', emoji: '🍜' } });
+    expect(withAccountName(named, user)).toBe(named);
   });
 });
 

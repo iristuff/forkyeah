@@ -146,6 +146,21 @@ describe('account store', () => {
     expect(s.cloudXP('bob')).toBe(10);
   });
 
+  it('greets a new account by name, but keeps a name the player chose', async () => {
+    const s = setup();
+    s.account.getState().start();
+    await s.account.getState().signInWithEmail('iris.le@example.com', 'right');
+    await synced(s);
+    expect(s.game.getState().progress.profile.name).toBe('Iris');
+    expect((s.fb.docs.get('iris.le@example.com') as Progress).profile.name).toBe('Iris');
+
+    const chosen = setup({ local: { ...emptyProgress(), profile: { name: 'Bao', emoji: '🍜' } } });
+    chosen.account.getState().start();
+    await chosen.account.getState().signInWithEmail('iris.le@example.com', 'right');
+    await synced(chosen);
+    expect(chosen.game.getState().progress.profile.name).toBe('Bao');
+  });
+
   it('saves changes to the cloud shortly after they happen', async () => {
     const s = setup();
     s.account.getState().start();

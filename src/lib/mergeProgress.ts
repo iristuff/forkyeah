@@ -54,3 +54,21 @@ function mergeRecords<T>(a: Record<string, T>, b: Record<string, T>, both: (x: T
 function earliest(a: string, b: string): string {
   return Date.parse(a) <= Date.parse(b) ? a : b;
 }
+
+// A friendly first name for a new account: "Iris Le" → "Iris", or from the
+// email when there's no display name: "iris.le42@x.com" → "Iris". null if neither helps.
+export function nameForAccount(user: { displayName: string | null; email: string | null }): string | null {
+  const first = (s: string) => s.trim().split(/\s+/)[0] ?? '';
+  const fromDisplay = user.displayName ? first(user.displayName) : '';
+  const fromEmail = user.email ? (user.email.split('@')[0].split(/[^\p{L}]+/u).find(Boolean) ?? '') : '';
+  const name = (fromDisplay || fromEmail).slice(0, 24);
+  if (!name) return null;
+  return fromDisplay ? name : name[0].toUpperCase() + name.slice(1).toLowerCase();
+}
+
+// Signed-in players who never picked a name get their account's name instead of "Chef"
+export function withAccountName(p: Progress, user: { displayName: string | null; email: string | null }): Progress {
+  const name = nameForAccount(user);
+  if (!name || p.profile.name !== emptyProgress().profile.name) return p;
+  return { ...p, profile: { ...p.profile, name } };
+}

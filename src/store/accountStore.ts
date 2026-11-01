@@ -12,7 +12,7 @@ import type { AccountBackend, AccountUser } from '../lib/firebase';
 import { isFirebaseConfigured } from '../lib/firebaseConfig';
 import { authErrorMessage, fromCloudProgress, sameProgress, toCloudProgress } from '../lib/cloudDoc';
 import { emptyProgress } from '../lib/game';
-import { mergeProgress } from '../lib/mergeProgress';
+import { mergeProgress, withAccountName } from '../lib/mergeProgress';
 import type { Progress } from '../types';
 import { STORE_VERSION, useGame, type GameState } from './gameStore';
 import { localStorageRepo, type SyncStorage } from './progressRepo';
@@ -116,11 +116,12 @@ export function createAccountStore(deps: AccountDeps) {
       }
       deps.storage.setItem(WELCOMED_KEY, '1');
       set({ status: 'signed-in', user, error: null, welcomed: true });
-      await mergeWithCloud(b, user.uid);
+      await mergeWithCloud(b, user);
     }
 
     // First sync after sign-in (or app start): merge device + cloud, save the result
-    async function mergeWithCloud(b: AccountBackend, uid: string) {
+    async function mergeWithCloud(b: AccountBackend, user: AccountUser) {
+      const { uid } = user;
       ready = false;
       set({ sync: 'syncing' });
       let cloud: Progress | null;
@@ -134,7 +135,7 @@ export function createAccountStore(deps: AccountDeps) {
       const local = deps.game.getState().progress;
       // Progress left by a different account is never merged into this one
       const base = owner() && owner() !== uid ? emptyProgress() : local;
-      const merged = cloud ? mergeProgress(base, cloud) : base;
+      const merged = withAccountName(cloud ? mergeProgress(base, cloud) : base, user);
       if (!sameProgress(merged, local)) deps.game.getState().replaceProgress(merged);
       deps.storage.setItem(OWNER_KEY, uid);
       ready = true;
@@ -186,9 +187,9 @@ export function createAccountStore(deps: AccountDeps) {
 
     async function retry() {
       if (!dirty || get().status !== 'signed-in') return;
-      const uid = get().user!.uid;
+      const user = get().user!;
       if (ready) await push();
-      else await mergeWithCloud(await ensureBackend(), uid);
+      else await mergeWithCloud(await ensureBackend(), user);
     }
 
     // Wraps a user action: busy flag, friendly errors, and an online check
