@@ -3,13 +3,20 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { loadEnv } from 'vite';
 
 const DIST = 'dist';
-const JS_GZIP_BUDGET_KB = 200;
+const INITIAL_JS_BUDGET_KB = 200; // what the first screen downloads
+const TOTAL_JS_BUDGET_KB = 400; // including lazy chunks (Firebase loads only for sign-in)
+
+// The Firebase web API key is public by design (it identifies the project; Firestore
+// rules protect the data), so it is the one Google key allowed in the bundle.
+const env = { ...loadEnv('production', process.cwd(), 'VITE_'), ...process.env };
+const ALLOWED_PUBLIC_KEYS = new Set([env.VITE_FIREBASE_API_KEY].filter(Boolean));
 
 // Patterns that must never end up in client code
 const SECRET_PATTERNS = [
-  { name: 'Google/Gemini API key', re: /AIza[0-9A-Za-z_-]{35}/ },
+  { name: 'Google/Gemini API key', re: /AIza[0-9A-Za-z_-]{35}/g },
   { name: 'Anthropic API key', re: /sk-ant-[0-9A-Za-z_-]{20,}/ },
   { name: 'OpenAI API key', re: /sk-(proj-)?[0-9A-Za-z]{32,}/ },
   { name: 'Supabase secret key', re: /sb_secret_[0-9A-Za-z_-]{10,}/ },
@@ -90,7 +97,8 @@ let leaks = 0;
 for (const file of files.filter(f => /\.(js|html|css|json|webmanifest|map)$/.test(f))) {
   const text = readFileSync(file, 'utf8');
   for (const { name, re } of SECRET_PATTERNS) {
-    if (re.test(text)) {
+    const found = re.global ? [...text.matchAll(re)].map(m => m[0]) : re.test(text) ? [''] : [];
+    if (found.some(match => !ALLOWED_PUBLIC_KEYS.has(match))) {
       leaks++;
       fail(`${name} found in ${relative(DIST, file)}`);
     }
@@ -100,10 +108,17 @@ if (leaks === 0) pass('no secrets in client bundle');
 
 // ── Bundle size ───────────────────────────────────────────────
 console.log('Bundle size');
+const gzKB = list => list.reduce((sum, f) => sum + gzipSync(readFileSync(f)).length, 0) / 1024;
 const jsFiles = files.filter(f => f.startsWith(join(DIST, 'assets')) && f.endsWith('.js'));
-const gzKB = jsFiles.reduce((sum, f) => sum + gzipSync(readFileSync(f)).length, 0) / 1024;
-if (gzKB <= JS_GZIP_BUDGET_KB) pass(`app JS ${gzKB.toFixed(1)} KB gzip (budget ${JS_GZIP_BUDGET_KB} KB)`);
-else fail(`app JS is ${gzKB.toFixed(1)} KB gzip, over the ${JS_GZIP_BUDGET_KB} KB budget`);
+// Initial = the entry script plus everything index.html preloads
+const initial = [...html.matchAll(/(?:src|href)="\/(assets\/[^"]+\.js)"/g)].map(m => join(DIST, m[1]));
+if (initial.length === 0) fail('no entry script found in index.html');
+const initialKB = gzKB(initial);
+const totalKB = gzKB(jsFiles);
+if (initialKB <= INITIAL_JS_BUDGET_KB) pass(`initial JS ${initialKB.toFixed(1)} KB gzip (budget ${INITIAL_JS_BUDGET_KB} KB)`);
+else fail(`initial JS is ${initialKB.toFixed(1)} KB gzip, over the ${INITIAL_JS_BUDGET_KB} KB budget`);
+if (totalKB <= TOTAL_JS_BUDGET_KB) pass(`all JS ${totalKB.toFixed(1)} KB gzip (budget ${TOTAL_JS_BUDGET_KB} KB)`);
+else fail(`all JS is ${totalKB.toFixed(1)} KB gzip, over the ${TOTAL_JS_BUDGET_KB} KB budget`);
 
 // ── Result ────────────────────────────────────────────────────
 if (failures.length) {

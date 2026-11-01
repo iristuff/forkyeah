@@ -5,10 +5,17 @@ import type { StateStorage } from 'zustand/middleware';
 
 export type ProgressRepo = StateStorage;
 
+// Device storage is synchronous; the account store relies on that
+export interface SyncStorage {
+  getItem: (name: string) => string | null;
+  setItem: (name: string, value: string) => void;
+  removeItem: (name: string) => void;
+}
+
 export const STORAGE_KEY = 'forkyeah:progress';
 
 // localStorage, but never throws (private mode, quota, blocked storage)
-export const localStorageRepo: ProgressRepo = {
+export const localStorageRepo: SyncStorage = {
   getItem: name => {
     try {
       return localStorage.getItem(name);
@@ -33,7 +40,7 @@ export const localStorageRepo: ProgressRepo = {
 };
 
 // For tests and previews
-export function memoryRepo(initial: Record<string, string> = {}): ProgressRepo & { dump(): Record<string, string> } {
+export function memoryRepo(initial: Record<string, string> = {}): SyncStorage & { dump(): Record<string, string> } {
   const data = new Map(Object.entries(initial));
   return {
     getItem: name => data.get(name) ?? null,
