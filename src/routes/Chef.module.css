@@ -111,42 +111,6 @@
   transform: scale(0.96);
 }
 
-.score {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  margin-top: var(--space-sm);
-  padding: var(--space-md);
-  border: 2px dashed var(--gold);
-  border-radius: var(--radius-lg);
-  background: var(--card);
-}
-
-.score > div {
-  flex: 1;
-  font-size: var(--fs-md);
-}
-
-.scoreArt {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-md);
-  background: var(--sun);
-}
-
-.scoreIcon {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--sand);
-  color: var(--dim);
-}
-
 .composer {
   position: fixed;
   left: 50%;
