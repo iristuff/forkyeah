@@ -5,7 +5,15 @@
   },
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/__/auth/:path*",
+      "destination": "https://forkyeah-f0cfa.firebaseapp.com/__/auth/:path*"
+    },
+    {
+      "source": "/__/firebase/:path*",
+      "destination": "https://forkyeah-f0cfa.firebaseapp.com/__/firebase/:path*"
+    },
+    {
+      "source": "/((?!api/|__/).*)",
       "destination": "/index.html"
     }
   ],

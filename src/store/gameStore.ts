@@ -23,6 +23,7 @@ export interface GameState {
   exportBackup: (now?: Date) => string;
   importBackup: (text: string) => { ok: true } | { ok: false; error: string };
   resetProgress: () => void;
+  replaceProgress: (progress: Progress) => void; // account sync only
 }
 
 export function createGameStore(repo: ProgressRepo = localStorageRepo) {
@@ -68,6 +69,8 @@ export function createGameStore(repo: ProgressRepo = localStorageRepo) {
           },
 
           resetProgress: () => set({ progress: emptyProgress(), lastEvents: [] }),
+
+          replaceProgress: progress => set({ progress, lastEvents: [] }),
         };
       },
       {

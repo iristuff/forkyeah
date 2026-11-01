@@ -30,8 +30,9 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
         navigateFallback: '/index.html',
-        // AI endpoints must always hit the network, never the cache
-        navigateFallbackDenylist: [/^\/api\//],
+        // AI endpoints and the Firebase sign-in handler (/__/auth, proxied by vercel.json)
+        // must always hit the network, never the app shell or the cache
+        navigateFallbackDenylist: [/^\/api\//, /^\/__\//],
         runtimeCaching: [
           { urlPattern: ({ url }) => url.pathname.startsWith('/api/'), handler: 'NetworkOnly' },
         ],

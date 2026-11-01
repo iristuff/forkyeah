@@ -76,3 +76,6 @@ export function useLeaderboard() {
   const day = today();
   return useMemo(() => buildLeaderboard(progress, day), [progress, day]);
 }
+
+// Accounts (sign-in + cloud sync): state and actions live in accountStore
+export { useAccount } from './accountStore';
