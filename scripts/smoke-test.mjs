@@ -21,7 +21,6 @@ const checks = [
   { path: '/icons/apple-touch-icon.png', type: 'image/png' },
   // API functions must load: a POST with no Origin gets our own 403 JSON (no AI call, no rate-limit hit)
   { path: '/api/chef', method: 'POST', status: 403, type: 'application/json', body: /"forbidden"/ },
-  { path: '/api/score-dish', method: 'POST', status: 403, type: 'application/json', body: /"forbidden"/ },
 ];
 
 async function get(url, method = 'GET', attempt = 1) {

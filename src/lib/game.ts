@@ -1,6 +1,6 @@
 // Core game rules as pure functions: (progress, input, now) -> { progress, events }.
 // The store calls these; the UI reads `events` to animate XP, level-ups, stamps.
-import type { CVScore, Dish, GameEvent, Progress } from '../types';
+import type { Dish, GameEvent, Progress } from '../types';
 import { ALL_DISHES, getCuisine, getDish } from '../content/cuisines';
 import { QUESTS } from '../content/quests';
 import { dayHash, localDay } from './dates';
@@ -111,24 +111,6 @@ export function completeStep(p: Progress, dishId: string, stepIdx: number, now: 
   return finish(p, next, today, now, events);
 }
 
-// Photo score from /api/score-dish. Bonus XP = overall score, but only the
-// improvement over your previous best is paid, so re-uploading can't farm XP.
-export function recordScore(p: Progress, dishId: string, raw: CVScore, now: Date): Result {
-  if (!getDish(dishId)) return { progress: p, events: [] };
-  const score = clampScore(raw);
-  const today = localDay(now);
-  const current = p.dishes[dishId] ?? { stepsDone: [] };
-  const prevBest = current.bestScore?.overall ?? 0;
-  const events: GameEvent[] = [];
-
-  let next = withActivity(p, today, events);
-  if (score.overall > prevBest) {
-    next = { ...next, dishes: { ...next.dishes, [dishId]: { ...current, bestScore: score } } };
-    next = addXP(next, score.overall - prevBest, 'Plating score', events);
-  }
-  return finish(p, next, today, now, events);
-}
-
 export function addChatMessage(p: Progress, message: Progress['chat'][number]): Progress {
   return { ...p, chat: [...p.chat, message].slice(-CHAT_HISTORY_LIMIT) };
 }
@@ -161,15 +143,4 @@ function finish(before: Progress, next: Progress, today: string, now: Date, even
   const newLevel = levelForXP(next.xp);
   if (newLevel > oldLevel) events.push({ type: 'level-up', level: newLevel, title: titleForLevel(newLevel) });
   return { progress: next, events };
-}
-
-function clampScore(s: CVScore): CVScore {
-  const c = (n: number) => Math.round(Math.min(100, Math.max(0, Number.isFinite(n) ? n : 0)));
-  return {
-    plating: c(s.plating),
-    technique: c(s.technique),
-    colorBalance: c(s.colorBalance),
-    portioning: c(s.portioning),
-    overall: c(s.overall),
-  };
 }

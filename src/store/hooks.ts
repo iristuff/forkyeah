@@ -52,7 +52,6 @@ export function useDish(dishId: string) {
       ...dishProgress(progress, dish),
       stepsDone: state?.stepsDone ?? [],
       completed: Boolean(state?.completedAt),
-      bestScore: state?.bestScore ?? null,
     };
   }, [progress, dishId]);
 }

@@ -32,18 +32,9 @@ export interface Cuisine {
 }
 
 // ── Progress (persisted on device) ────────────────────────────
-export interface CVScore {
-  plating: number; // 0-100
-  technique: number;
-  colorBalance: number;
-  portioning: number;
-  overall: number;
-}
-
 export interface DishProgress {
   stepsDone: number[]; // step indexes, sorted, unique
   completedAt?: string; // ISO timestamp
-  bestScore?: CVScore;
 }
 
 export interface Streak {
@@ -107,7 +98,6 @@ export interface Post {
   dishName: string;
   dishEmoji: string;
   caption: string;
-  score: CVScore;
   likes: number;
   comments: number;
   timeAgo: string;
