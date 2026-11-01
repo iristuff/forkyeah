@@ -7,6 +7,7 @@ import Chef from './routes/Chef';
 import Profile from './routes/Profile';
 import Cuisine from './routes/Cuisine';
 import Cook from './routes/Cook';
+import Welcome from './routes/Welcome';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
+  { path: '/welcome', element: <Welcome /> },
   {
     element: <FocusLayout />,
     children: [{ path: '/cook/:dishId', element: <Cook /> }],

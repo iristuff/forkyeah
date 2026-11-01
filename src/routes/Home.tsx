@@ -34,7 +34,7 @@ export default function Home() {
           <p className="dim">{date}</p>
           <h1>Hi, {profile.name}!</h1>
         </div>
-        <Mascot size={60} />
+        <Mascot size={60} splashTarget />
       </header>
 
       <section className={styles.level} aria-label="Your level">

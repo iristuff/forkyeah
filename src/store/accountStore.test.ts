@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { AccountBackend, AccountUser } from '../lib/firebase';
 import { emptyProgress } from '../lib/game';
 import type { Progress } from '../types';
-import { createAccountStore, EMAIL_KEY, OWNER_KEY } from './accountStore';
+import { createAccountStore, EMAIL_KEY, needsWelcome, OWNER_KEY, WELCOMED_KEY } from './accountStore';
 import { createGameStore } from './gameStore';
 import { memoryRepo } from './progressRepo';
 
@@ -252,5 +252,52 @@ describe('account store', () => {
     await s.account.getState().sendEmailLink(' iris@example.com ');
     expect(s.account.getState().emailLinkSentTo).toBe('iris@example.com');
     expect(s.storage.getItem(EMAIL_KEY)).toBe('iris@example.com');
+  });
+
+  it('confirms a password reset email, and forgets it when the form changes', async () => {
+    const s = setup();
+    s.account.getState().start();
+    await s.account.getState().sendPasswordReset(' iris@example.com ');
+    expect(s.account.getState().resetSentTo).toBe('iris@example.com');
+    s.account.getState().clearError();
+    expect(s.account.getState().resetSentTo).toBeNull();
+  });
+
+  it('welcomes a new guest once, until they choose to stay a guest', () => {
+    const s = setup();
+    s.account.getState().start();
+    expect(needsWelcome(s.account.getState())).toBe(true);
+    s.account.getState().finishWelcome();
+    expect(needsWelcome(s.account.getState())).toBe(false);
+    expect(s.storage.getItem(WELCOMED_KEY)).toBe('1');
+    expect(setup({ storage: { [WELCOMED_KEY]: '1' } }).account.getState().welcomed).toBe(true);
+  });
+
+  it('never welcomes a signed-in player, or anyone when accounts are off', async () => {
+    const s = setup();
+    s.account.getState().start();
+    await s.account.getState().signInWithEmail('iris@example.com', 'right');
+    await synced(s);
+    expect(s.account.getState().welcomed).toBe(true);
+    await s.account.getState().signOut();
+    expect(needsWelcome(s.account.getState())).toBe(false);
+
+    const off = setup({ configured: false });
+    off.account.getState().start();
+    expect(needsWelcome(off.account.getState())).toBe(false);
+  });
+
+  it('can give up on a sign-in link opened on another device', async () => {
+    const s = setup({ href: `${ORIGIN}/profile?mode=signIn&oobCode=abc` });
+    s.account.getState().start();
+    await vi.waitFor(() => expect(s.account.getState().status).toBe('needs-email'));
+    s.account.getState().cancelEmailLink();
+    expect(s.account.getState().status).toBe('signed-out');
+    expect(s.href()).toBe(`${ORIGIN}/profile`);
+  });
+
+  it('welcomes back to finish a sign-in link opened on another device', () => {
+    expect(needsWelcome({ status: 'needs-email', welcomed: true })).toBe(true);
+    expect(needsWelcome({ status: 'loading', welcomed: false })).toBe(false);
   });
 });

@@ -19,7 +19,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         theme_color: '#FFFCF3',
-        background_color: '#FFFCF3',
+        background_color: '#FFE27A', // Android's launch screen: same yellow as our splash
         categories: ['food', 'education', 'lifestyle'],
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
@@ -29,6 +29,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+        // iPhone launch images are read once when the app is installed: don't precache them
+        globIgnores: ['splash/**'],
         navigateFallback: '/index.html',
         // AI endpoints and the Firebase sign-in handler (/__/auth, proxied by vercel.json)
         // must always hit the network, never the app shell or the cache

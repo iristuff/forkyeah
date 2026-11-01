@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import { requestPersistentStorage } from './lib/platform';
 import { useAccount } from './store/accountStore';
+import { playSplash } from './components/splash';
 import '@fontsource-variable/baloo-2';
 import '@fontsource-variable/rethink-sans';
 import './styles/global.css';
@@ -17,3 +18,4 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 );
+void playSplash();

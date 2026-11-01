@@ -41,6 +41,12 @@ const PATHS = {
     </>
   ),
   send: <path d="M4 12l16-8-6 16-2.5-6.5z" />,
+  mail: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="M4 7l8 6 8-6" />
+    </>
+  ),
   check: <path d="M5 12.5l4.5 4.5L19 7" />,
   lock: (
     <>

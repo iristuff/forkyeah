@@ -1,4 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react';
+import { useNavigate } from 'react-router';
+import { useAccount } from '../store/accountStore';
 import { useGame } from '../store/gameStore';
 import { useLevel, useProgress, useQuests, useStreak } from '../store/hooks';
 import { localDay } from '../lib/dates';
@@ -17,6 +19,8 @@ export default function Profile() {
   const exportBackup = useGame(s => s.exportBackup);
   const importBackup = useGame(s => s.importBackup);
   const fileInput = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const canSignIn = useAccount(s => s.status === 'signed-out');
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
 
   const dishesCooked = Object.values(progress.dishes).filter(d => d.completedAt).length;
@@ -99,6 +103,13 @@ export default function Profile() {
 
       <h2 className={styles.h2}>Your progress</h2>
       <div className={styles.list}>
+        {canSignIn && (
+          <button onClick={() => navigate('/welcome', { state: { from: '/profile' } })}>
+            <Icon name="profile" size={20} />
+            <span>Sign in to save your progress</span>
+            <Icon name="chevron" size={18} />
+          </button>
+        )}
         <button onClick={saveBackup}>
           <Icon name="download" size={20} />
           <span>Save a backup file</span>

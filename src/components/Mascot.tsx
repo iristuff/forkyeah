@@ -28,9 +28,11 @@ interface Props {
   sparks?: boolean;
   className?: string;
   title?: string;
+  /** The launch splash's mascot lands here (see splash.ts) */
+  splashTarget?: boolean;
 }
 
-export function Mascot({ size = 48, party = false, sparks = !party, className, title }: Props) {
+export function Mascot({ size = 48, party = false, sparks = !party, className, title, splashTarget }: Props) {
   const id = useId();
   return (
     <svg
@@ -41,6 +43,7 @@ export function Mascot({ size = 48, party = false, sparks = !party, className, t
       role={title ? 'img' : undefined}
       aria-hidden={title ? undefined : true}
       aria-labelledby={title ? id : undefined}
+      data-splash-target={splashTarget || undefined}
     >
       {title && <title id={id}>{title}</title>}
       {party &&

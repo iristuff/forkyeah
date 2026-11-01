@@ -34,14 +34,18 @@ export interface AccountState {
   busy: boolean; // an action is running: disable buttons
   error: string | null; // friendly message for the last failed action
   emailLinkSentTo: string | null;
+  resetSentTo: string | null; // a password reset email went here
+  welcomed: boolean; // has seen the sign-in welcome (signed in, or chose to stay a guest)
 
   start: () => void; // once, at app start
+  finishWelcome: () => void; // stay a guest for now: don't show the welcome again
   signInWithGoogle: () => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   sendEmailLink: (email: string) => Promise<void>;
   completeEmailLink: (email: string) => Promise<void>;
+  cancelEmailLink: () => void; // give up on a link opened on another device
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   syncNow: () => Promise<void>;
@@ -53,6 +57,7 @@ export interface AccountState {
 export const OWNER_KEY = 'forkyeah:account';
 export const EMAIL_KEY = 'forkyeah:emailForSignIn';
 export const PENDING_KEY = 'forkyeah:authPending';
+export const WELCOMED_KEY = 'forkyeah:welcomed';
 export const SAVE_DELAY_MS = 2000;
 
 export interface AccountDeps {
@@ -109,7 +114,8 @@ export function createAccountStore(deps: AccountDeps) {
         if (get().status !== 'needs-email') set({ status: 'signed-out', user: null, sync: 'idle' });
         return;
       }
-      set({ status: 'signed-in', user, error: null });
+      deps.storage.setItem(WELCOMED_KEY, '1');
+      set({ status: 'signed-in', user, error: null, welcomed: true });
       await mergeWithCloud(b, user.uid);
     }
 
@@ -224,6 +230,8 @@ export function createAccountStore(deps: AccountDeps) {
       busy: false,
       error: null,
       emailLinkSentTo: null,
+      resetSentTo: null,
+      welcomed: !deps.configured || deps.storage.getItem(WELCOMED_KEY) !== null,
 
       start() {
         if (!deps.configured) return;
@@ -245,7 +253,12 @@ export function createAccountStore(deps: AccountDeps) {
       signInWithEmail: (email, password) =>
         run(async () => (await ensureBackend()).signInWithEmail(email.trim(), password)),
 
-      sendPasswordReset: email => run(async () => (await ensureBackend()).sendPasswordReset(email.trim())),
+      sendPasswordReset: email =>
+        run(async () => {
+          const clean = email.trim();
+          await (await ensureBackend()).sendPasswordReset(clean);
+          set({ resetSentTo: clean });
+        }),
 
       sendEmailLink: email =>
         run(async () => {
@@ -264,6 +277,12 @@ export function createAccountStore(deps: AccountDeps) {
           deps.page.replaceUrl(`${url.origin}${url.pathname}`); // drop the one-time code from the address bar
           set({ emailLinkSentTo: null });
         }),
+
+      cancelEmailLink() {
+        const url = new URL(deps.page.href());
+        deps.page.replaceUrl(`${url.origin}${url.pathname}`);
+        set({ status: 'signed-out', error: null });
+      },
 
       signOut: () =>
         run(async () => {
@@ -294,10 +313,19 @@ export function createAccountStore(deps: AccountDeps) {
         await retry();
       },
 
-      clearError: () => set({ error: null }),
+      finishWelcome() {
+        deps.storage.setItem(WELCOMED_KEY, '1');
+        set({ welcomed: true });
+      },
+
+      clearError: () => set({ error: null, resetSentTo: null }),
     };
   });
 }
+
+// First launch as a guest, or finishing an email link: show the sign-in welcome
+export const needsWelcome = (s: Pick<AccountState, 'status' | 'welcomed'>) =>
+  s.status === 'needs-email' || (s.status === 'signed-out' && !s.welcomed);
 
 export const useAccount = createAccountStore({
   configured: isFirebaseConfigured,

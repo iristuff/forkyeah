@@ -1,0 +1,195 @@
+.page {
+  max-width: 560px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding-bottom: calc(var(--safe-bottom) + var(--space-2xl));
+  display: flex;
+  flex-direction: column;
+}
+
+/* The launch splash's yellow, kept as a field the mascot lands in */
+.hero {
+  display: grid;
+  place-items: center;
+  min-height: 40dvh;
+  padding: calc(var(--safe-top) + var(--space-3xl)) var(--space-xl) var(--space-3xl);
+  border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+  background: var(--sun);
+}
+
+.compact {
+  min-height: 0;
+  padding-top: calc(var(--safe-top) + var(--space-lg));
+  padding-bottom: var(--space-lg);
+}
+
+.mascot {
+  display: block;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2xl) var(--space-xl) 0;
+}
+
+.body h1 {
+  font-size: var(--fs-title);
+}
+
+.lede {
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-2xl);
+  color: var(--ink-2);
+  max-width: 34ch;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* "Maybe later" sits at the foot of the screen, under the thumb */
+.later {
+  margin-top: auto;
+  padding-top: var(--space-3xl);
+  text-align: center;
+  font-size: var(--fs-md);
+}
+
+.textBtn {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-md);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--red-text);
+  font-weight: 700;
+  font-size: var(--fs-base);
+}
+
+.textBtn:active {
+  background: var(--sun-soft);
+}
+
+.textBtn:disabled {
+  color: var(--locked);
+  background: transparent;
+  cursor: not-allowed;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.form .lede {
+  margin-bottom: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: var(--space-xs);
+  border-radius: var(--radius-full);
+  background: var(--sand);
+}
+
+.segments button {
+  min-height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 700;
+  font-size: var(--fs-md);
+  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.segments .on {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 700;
+  font-size: var(--fs-md);
+}
+
+.field input {
+  min-height: 52px;
+  padding: 0 var(--space-lg);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--card);
+  box-shadow: inset 0 0 0 2px var(--line-strong);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 400;
+  font-size: var(--fs-base); /* 16px: iOS doesn't zoom in on focus */
+  transition: box-shadow 160ms var(--ease-out);
+}
+
+.field input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--red-text);
+}
+
+.field small {
+  font-weight: 400;
+  font-size: var(--fs-sm);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: calc(var(--space-sm) * -1);
+}
+
+.links .textBtn {
+  font-size: var(--fs-md);
+}
+
+.error,
+.notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.error {
+  background: var(--alert-bg);
+  color: var(--alert-ink);
+}
+
+.choices + .error,
+.lede + .error {
+  margin-bottom: var(--space-lg);
+}
+
+.notice {
+  background: var(--done-bg);
+  color: var(--done-ink);
+}
+
+.notice svg {
+  flex: none;
+}
