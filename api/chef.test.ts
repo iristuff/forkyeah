@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createChefHandler, type ChefDeps } from './chef';
 import { UpstreamError, withRetry, type ChefModel } from './_lib/ai';
 import { isAllowedOrigin } from './_lib/http';
-import { memoryRateLimiter, upstashRateLimiter } from './_lib/rateLimit';
+import { memoryRateLimiter, redisConfig, upstashRateLimiter } from './_lib/rateLimit';
 import { buildChefSystemPrompt } from './_lib/prompts';
 import { askChef, ChefError, prepareHistory } from '../src/lib/chefClient';
 
@@ -155,6 +155,13 @@ describe('rate limiters', () => {
     expect((await limit('k', 1, 60)).ok).toBe(true);
   });
 
+  it('reads Redis config from Upstash or Vercel Marketplace (KV_*) env names', () => {
+    expect(redisConfig({ UPSTASH_REDIS_REST_URL: 'https://u', UPSTASH_REDIS_REST_TOKEN: 't1' })).toEqual({ url: 'https://u', token: 't1' });
+    expect(redisConfig({ KV_REST_API_URL: 'https://kv', KV_REST_API_TOKEN: 't2' })).toEqual({ url: 'https://kv', token: 't2' });
+    expect(redisConfig({ KV_REST_API_URL: 'https://kv' })).toBeNull();
+    expect(redisConfig({})).toBeNull();
+  });
+
   it('upstash limiter sends INCR + EXPIRE and reads the count', async () => {
     const fetchFn = vi.fn(async () => Response.json([{ result: 3 }, { result: 1 }]));
     const result = await upstashRateLimiter('https://redis.example', 'tok', fetchFn as unknown as typeof fetch)('chef:1.2.3.4', 2, 60);
@@ -175,6 +182,17 @@ describe('system prompt', () => {
   it('falls back to the persona for unknown dishes', () => {
     expect(buildChefSystemPrompt('nope')).toContain('Fork Yeah Sous Chef');
     expect(buildChefSystemPrompt('nope')).not.toContain('The user is cooking');
+  });
+
+  it('adds the profile skill level, but lets the chat override it', () => {
+    expect(buildChefSystemPrompt(undefined, undefined, 'new')).toContain('new cook');
+    expect(buildChefSystemPrompt('oyakodon', 1, 'confident')).toMatch(/confident cook[\s\S]*Their messages still win[\s\S]*step 2/);
+    expect(buildChefSystemPrompt('oyakodon')).not.toContain('Their messages still win');
+  });
+
+  it('rejects an unknown skill level', async () => {
+    const res = await handler()(req({ ...hello, skill: 'wizard' }));
+    expect(res.status).toBe(400);
   });
 });
 

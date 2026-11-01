@@ -1,6 +1,8 @@
+import type { CookingSkill } from '../types';
+
 // Browser client for POST /api/chef. Streams the reply chunk by chunk.
 //
-//   const reply = await askChef({ messages, dishId, stepIdx }, chunk => setDraft(d => d + chunk), abort.signal);
+//   const reply = await askChef({ messages, dishId, stepIdx, skill }, chunk => setDraft(d => d + chunk), abort.signal);
 
 export interface ChefTurn {
   role: 'user' | 'model';
@@ -11,6 +13,7 @@ export interface ChefRequest {
   messages: ChefTurn[];
   dishId?: string;
   stepIdx?: number;
+  skill?: CookingSkill;
 }
 
 export type ChefErrorCode = 'offline' | 'rate_limited' | 'bad_request' | 'unavailable' | 'interrupted' | 'aborted';

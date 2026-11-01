@@ -32,6 +32,7 @@ export function isProgress(v: unknown): v is Progress {
   return (
     isObj(v) &&
     isObj(v.profile) && isStr(v.profile.name) && isStr(v.profile.emoji) &&
+    (v.profile.skill === undefined || ['new', 'some', 'confident'].includes(v.profile.skill as string)) &&
     isNum(v.xp) && v.xp >= 0 &&
     isObj(v.streak) && isNum(v.streak.count) && (v.streak.lastDay === null || isDay(v.streak.lastDay)) &&
     isRecordOf(v.dishes, isDishProgress) &&
