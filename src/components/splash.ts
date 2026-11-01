@@ -15,13 +15,21 @@ export async function playSplash(): Promise<void> {
   const splash = document.getElementById('splash');
   if (!splash) return;
   splash.style.animation = 'none'; // JS is running: cancel the no-JS failsafe
+  try {
+    await hooray(splash);
+  } finally {
+    // Whatever happens, never leave the splash covering the app
+    splash.remove();
+  }
+}
 
+async function hooray(splash: HTMLElement) {
   const target = await firstScreen();
   await wait(Math.max(0, STILL_MS - performance.now()));
 
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !splash.animate) {
+  if (!splash.animate) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     await splash.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, easing: 'ease-out' }).finished;
-    splash.remove();
     return;
   }
 
@@ -61,21 +69,23 @@ export async function playSplash(): Promise<void> {
 
   if (target) {
     target.style.visibility = 'hidden';
-    const from = holder.getBoundingClientRect();
-    const to = target.getBoundingClientRect();
-    const dx = to.left + to.width / 2 - (from.left + from.width / 2);
-    const dy = to.top + to.height / 2 - (from.top + from.height / 2);
-    await holder.animate([{ transform: 'none' }, { transform: `translate(${dx}px, ${dy}px) scale(${to.width / from.width})` }], {
-      duration: 600,
-      easing: 'cubic-bezier(0.45, 0, 0.2, 1)',
-      fill: 'forwards',
-    }).finished;
-    target.style.visibility = '';
+    try {
+      const from = holder.getBoundingClientRect();
+      const to = target.getBoundingClientRect();
+      const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+      const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+      await holder.animate([{ transform: 'none' }, { transform: `translate(${dx}px, ${dy}px) scale(${to.width / from.width})` }], {
+        duration: 600,
+        easing: 'cubic-bezier(0.45, 0, 0.2, 1)',
+        fill: 'forwards',
+      }).finished;
+    } finally {
+      target.style.visibility = '';
+    }
   } else {
     await holder.animate([{ opacity: 1 }, { opacity: 0, transform: 'scale(0.9)' }], { duration: 400, easing: EASE_OUT, fill: 'forwards' })
       .finished;
   }
-  splash.remove();
 }
 
 // Waits (briefly) for React's first screen, and returns its mascot if it has one

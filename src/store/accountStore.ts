@@ -83,6 +83,7 @@ export function createAccountStore(deps: AccountDeps) {
   let dirty = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let unwatchGame: (() => void) | undefined;
+  let emailLink: string | undefined; // kept: the welcome redirect drops it from the address bar
 
   const owner = () => deps.storage.getItem(OWNER_KEY);
 
@@ -95,6 +96,7 @@ export function createAccountStore(deps: AccountDeps) {
           .finally(() => deps.storage.removeItem(PENDING_KEY));
         const href = deps.page.href();
         if (b.isEmailLink(href)) {
+          emailLink = href;
           const email = deps.storage.getItem(EMAIL_KEY);
           if (email) void get().completeEmailLink(email);
           else set({ status: 'needs-email' });
@@ -277,22 +279,24 @@ export function createAccountStore(deps: AccountDeps) {
 
       completeEmailLink: email =>
         run(async () => {
-          const href = deps.page.href();
-          await (await ensureBackend()).completeEmailLink(email.trim(), href);
+          await (await ensureBackend()).completeEmailLink(email.trim(), emailLink ?? deps.page.href());
+          emailLink = undefined;
           deps.storage.removeItem(EMAIL_KEY);
           dropLinkCode();
           set({ emailLinkSentTo: null });
         }),
 
       cancelEmailLink() {
+        emailLink = undefined;
         dropLinkCode();
         set({ status: 'signed-out', error: null });
       },
 
       signOut: () =>
         run(async () => {
-          // Save the latest progress first: signing out clears it from this device
-          if (dirty && !(await push())) throw { code: 'forkyeah/unsaved' };
+          // Save the latest progress first (re-running a failed merge): signing out clears it from this device
+          await retry();
+          if (dirty) throw { code: 'forkyeah/unsaved' };
           await (await ensureBackend()).signOut();
           resetToGuest();
         }),
@@ -303,11 +307,16 @@ export function createAccountStore(deps: AccountDeps) {
           const uid = get().user?.uid;
           if (!uid) return;
           const progress = toCloudProgress(deps.game.getState().progress);
+          // Stop saving, so a pending save can't recreate the data mid-delete
+          clearTimeout(timer);
+          const wasReady = ready;
+          ready = false;
           await b.deleteProgress(uid);
           try {
             await b.deleteUser();
           } catch (err) {
             await b.pushProgress(uid, progress, STORE_VERSION).catch(() => undefined); // put the data back
+            ready = wasReady;
             throw err;
           }
           resetToGuest();
