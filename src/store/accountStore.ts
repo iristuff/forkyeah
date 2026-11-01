@@ -12,7 +12,7 @@ import type { AccountBackend, AccountUser } from '../lib/firebase';
 import { isFirebaseConfigured } from '../lib/firebaseConfig';
 import { authErrorMessage, fromCloudProgress, sameProgress, toCloudProgress } from '../lib/cloudDoc';
 import { emptyProgress } from '../lib/game';
-import { mergeProgress } from '../lib/mergeProgress';
+import { mergeProgress, withAccountName } from '../lib/mergeProgress';
 import type { Progress } from '../types';
 import { STORE_VERSION, useGame, type GameState } from './gameStore';
 import { localStorageRepo, type SyncStorage } from './progressRepo';
@@ -34,14 +34,18 @@ export interface AccountState {
   busy: boolean; // an action is running: disable buttons
   error: string | null; // friendly message for the last failed action
   emailLinkSentTo: string | null;
+  resetSentTo: string | null; // a password reset email went here
+  welcomed: boolean; // has seen the sign-in welcome (signed in, or chose to stay a guest)
 
   start: () => void; // once, at app start
+  finishWelcome: () => void; // stay a guest for now: don't show the welcome again
   signInWithGoogle: () => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   sendEmailLink: (email: string) => Promise<void>;
   completeEmailLink: (email: string) => Promise<void>;
+  cancelEmailLink: () => void; // give up on a link opened on another device
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   syncNow: () => Promise<void>;
@@ -53,6 +57,7 @@ export interface AccountState {
 export const OWNER_KEY = 'forkyeah:account';
 export const EMAIL_KEY = 'forkyeah:emailForSignIn';
 export const PENDING_KEY = 'forkyeah:authPending';
+export const WELCOMED_KEY = 'forkyeah:welcomed';
 export const SAVE_DELAY_MS = 2000;
 
 export interface AccountDeps {
@@ -78,6 +83,7 @@ export function createAccountStore(deps: AccountDeps) {
   let dirty = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let unwatchGame: (() => void) | undefined;
+  let emailLink: string | undefined; // kept: the welcome redirect drops it from the address bar
 
   const owner = () => deps.storage.getItem(OWNER_KEY);
 
@@ -90,6 +96,7 @@ export function createAccountStore(deps: AccountDeps) {
           .finally(() => deps.storage.removeItem(PENDING_KEY));
         const href = deps.page.href();
         if (b.isEmailLink(href)) {
+          emailLink = href;
           const email = deps.storage.getItem(EMAIL_KEY);
           if (email) void get().completeEmailLink(email);
           else set({ status: 'needs-email' });
@@ -109,12 +116,14 @@ export function createAccountStore(deps: AccountDeps) {
         if (get().status !== 'needs-email') set({ status: 'signed-out', user: null, sync: 'idle' });
         return;
       }
+      get().finishWelcome();
       set({ status: 'signed-in', user, error: null });
-      await mergeWithCloud(b, user.uid);
+      await mergeWithCloud(b, user);
     }
 
     // First sync after sign-in (or app start): merge device + cloud, save the result
-    async function mergeWithCloud(b: AccountBackend, uid: string) {
+    async function mergeWithCloud(b: AccountBackend, user: AccountUser) {
+      const { uid } = user;
       ready = false;
       set({ sync: 'syncing' });
       let cloud: Progress | null;
@@ -128,7 +137,7 @@ export function createAccountStore(deps: AccountDeps) {
       const local = deps.game.getState().progress;
       // Progress left by a different account is never merged into this one
       const base = owner() && owner() !== uid ? emptyProgress() : local;
-      const merged = cloud ? mergeProgress(base, cloud) : base;
+      const merged = withAccountName(cloud ? mergeProgress(base, cloud) : base, user);
       if (!sameProgress(merged, local)) deps.game.getState().replaceProgress(merged);
       deps.storage.setItem(OWNER_KEY, uid);
       ready = true;
@@ -180,9 +189,9 @@ export function createAccountStore(deps: AccountDeps) {
 
     async function retry() {
       if (!dirty || get().status !== 'signed-in') return;
-      const uid = get().user!.uid;
+      const user = get().user!;
       if (ready) await push();
-      else await mergeWithCloud(await ensureBackend(), uid);
+      else await mergeWithCloud(await ensureBackend(), user);
     }
 
     // Wraps a user action: busy flag, friendly errors, and an online check
@@ -199,6 +208,12 @@ export function createAccountStore(deps: AccountDeps) {
       } finally {
         set({ busy: false });
       }
+    }
+
+    // Drop the one-time sign-in code from the address bar
+    function dropLinkCode() {
+      const url = new URL(deps.page.href());
+      deps.page.replaceUrl(`${url.origin}${url.pathname}`);
     }
 
     function resetToGuest() {
@@ -224,6 +239,8 @@ export function createAccountStore(deps: AccountDeps) {
       busy: false,
       error: null,
       emailLinkSentTo: null,
+      resetSentTo: null,
+      welcomed: deps.storage.getItem(WELCOMED_KEY) !== null,
 
       start() {
         if (!deps.configured) return;
@@ -245,7 +262,12 @@ export function createAccountStore(deps: AccountDeps) {
       signInWithEmail: (email, password) =>
         run(async () => (await ensureBackend()).signInWithEmail(email.trim(), password)),
 
-      sendPasswordReset: email => run(async () => (await ensureBackend()).sendPasswordReset(email.trim())),
+      sendPasswordReset: email =>
+        run(async () => {
+          const clean = email.trim();
+          await (await ensureBackend()).sendPasswordReset(clean);
+          set({ resetSentTo: clean });
+        }),
 
       sendEmailLink: email =>
         run(async () => {
@@ -257,18 +279,24 @@ export function createAccountStore(deps: AccountDeps) {
 
       completeEmailLink: email =>
         run(async () => {
-          const href = deps.page.href();
-          await (await ensureBackend()).completeEmailLink(email.trim(), href);
+          await (await ensureBackend()).completeEmailLink(email.trim(), emailLink ?? deps.page.href());
+          emailLink = undefined;
           deps.storage.removeItem(EMAIL_KEY);
-          const url = new URL(href);
-          deps.page.replaceUrl(`${url.origin}${url.pathname}`); // drop the one-time code from the address bar
+          dropLinkCode();
           set({ emailLinkSentTo: null });
         }),
 
+      cancelEmailLink() {
+        emailLink = undefined;
+        dropLinkCode();
+        set({ status: 'signed-out', error: null });
+      },
+
       signOut: () =>
         run(async () => {
-          // Save the latest progress first: signing out clears it from this device
-          if (dirty && !(await push())) throw { code: 'forkyeah/unsaved' };
+          // Save the latest progress first (re-running a failed merge): signing out clears it from this device
+          await retry();
+          if (dirty) throw { code: 'forkyeah/unsaved' };
           await (await ensureBackend()).signOut();
           resetToGuest();
         }),
@@ -279,11 +307,16 @@ export function createAccountStore(deps: AccountDeps) {
           const uid = get().user?.uid;
           if (!uid) return;
           const progress = toCloudProgress(deps.game.getState().progress);
+          // Stop saving, so a pending save can't recreate the data mid-delete
+          clearTimeout(timer);
+          const wasReady = ready;
+          ready = false;
           await b.deleteProgress(uid);
           try {
             await b.deleteUser();
           } catch (err) {
             await b.pushProgress(uid, progress, STORE_VERSION).catch(() => undefined); // put the data back
+            ready = wasReady;
             throw err;
           }
           resetToGuest();
@@ -294,10 +327,19 @@ export function createAccountStore(deps: AccountDeps) {
         await retry();
       },
 
-      clearError: () => set({ error: null }),
+      finishWelcome() {
+        deps.storage.setItem(WELCOMED_KEY, '1');
+        set({ welcomed: true });
+      },
+
+      clearError: () => set({ error: null, resetSentTo: null }),
     };
   });
 }
+
+// First launch as a guest, or finishing an email link: show the sign-in welcome
+export const needsWelcome = (s: Pick<AccountState, 'status' | 'welcomed'>) =>
+  s.status === 'needs-email' || (s.status === 'signed-out' && !s.welcomed);
 
 export const useAccount = createAccountStore({
   configured: isFirebaseConfigured,
