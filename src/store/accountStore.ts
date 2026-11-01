@@ -114,8 +114,8 @@ export function createAccountStore(deps: AccountDeps) {
         if (get().status !== 'needs-email') set({ status: 'signed-out', user: null, sync: 'idle' });
         return;
       }
-      deps.storage.setItem(WELCOMED_KEY, '1');
-      set({ status: 'signed-in', user, error: null, welcomed: true });
+      get().finishWelcome();
+      set({ status: 'signed-in', user, error: null });
       await mergeWithCloud(b, user);
     }
 
@@ -208,6 +208,12 @@ export function createAccountStore(deps: AccountDeps) {
       }
     }
 
+    // Drop the one-time sign-in code from the address bar
+    function dropLinkCode() {
+      const url = new URL(deps.page.href());
+      deps.page.replaceUrl(`${url.origin}${url.pathname}`);
+    }
+
     function resetToGuest() {
       ready = false;
       dirty = false;
@@ -232,7 +238,7 @@ export function createAccountStore(deps: AccountDeps) {
       error: null,
       emailLinkSentTo: null,
       resetSentTo: null,
-      welcomed: !deps.configured || deps.storage.getItem(WELCOMED_KEY) !== null,
+      welcomed: deps.storage.getItem(WELCOMED_KEY) !== null,
 
       start() {
         if (!deps.configured) return;
@@ -274,14 +280,12 @@ export function createAccountStore(deps: AccountDeps) {
           const href = deps.page.href();
           await (await ensureBackend()).completeEmailLink(email.trim(), href);
           deps.storage.removeItem(EMAIL_KEY);
-          const url = new URL(href);
-          deps.page.replaceUrl(`${url.origin}${url.pathname}`); // drop the one-time code from the address bar
+          dropLinkCode();
           set({ emailLinkSentTo: null });
         }),
 
       cancelEmailLink() {
-        const url = new URL(deps.page.href());
-        deps.page.replaceUrl(`${url.origin}${url.pathname}`);
+        dropLinkCode();
         set({ status: 'signed-out', error: null });
       },
 

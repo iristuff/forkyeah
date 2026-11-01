@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import { FocusLayout, Layout } from './components/Layout';
+import { FocusLayout, Layout, WelcomeGate } from './components/Layout';
 import Home from './routes/Home';
 import Passport from './routes/Passport';
 import Ranks from './routes/Ranks';
@@ -11,15 +11,20 @@ import Welcome from './routes/Welcome';
 
 const router = createBrowserRouter([
   {
-    element: <Layout />,
+    element: <WelcomeGate />,
     children: [
-      { path: '/', element: <Home /> },
-      { path: '/passport', element: <Passport /> },
-      { path: '/ranks', element: <Ranks /> },
-      { path: '/chef', element: <Chef /> },
-      { path: '/profile', element: <Profile /> },
-      { path: '/cuisine/:cuisineId', element: <Cuisine /> },
-      { path: '*', element: <Navigate to="/" replace /> },
+      {
+        element: <Layout />,
+        children: [
+          { path: '/', element: <Home /> },
+          { path: '/passport', element: <Passport /> },
+          { path: '/ranks', element: <Ranks /> },
+          { path: '/chef', element: <Chef /> },
+          { path: '/profile', element: <Profile /> },
+          { path: '/cuisine/:cuisineId', element: <Cuisine /> },
+          { path: '*', element: <Navigate to="/" replace /> },
+        ],
+      },
     ],
   },
   { path: '/welcome', element: <Welcome /> },

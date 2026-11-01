@@ -21,12 +21,11 @@ export default function Welcome() {
   const [password, setPassword] = useState('');
   const [linkSent, setLinkSent] = useState(false);
 
-  const back = from === '/welcome' ? '/' : from;
-  const leave = () => navigate(back, { replace: true });
+  const leave = () => navigate(from, { replace: true });
 
   useEffect(() => {
-    if (status === 'signed-in') navigate(back, { replace: true });
-  }, [status, back, navigate]);
+    if (status === 'signed-in') navigate(from, { replace: true });
+  }, [status, from, navigate]);
 
   if (status === 'disabled') return <Navigate to="/" replace />;
 
@@ -59,7 +58,7 @@ export default function Welcome() {
   return (
     <main className={styles.page}>
       <section className={`${styles.hero} ${compact ? styles.compact : ''}`}>
-        <Mascot size={compact ? 92 : 156} splashTarget className={styles.mascot} />
+        <Mascot size={compact ? 92 : 156} data-splash-target />
       </section>
 
       <div className={styles.body}>

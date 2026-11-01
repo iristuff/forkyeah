@@ -5,7 +5,7 @@
 
 const CONFETTI = ['var(--tomato)', 'var(--blue)', 'var(--green)', 'var(--pink)', 'var(--gold)'];
 const ARMS_DOWN = 128; // degrees, matching the still frame in index.html
-const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)'; // --ease-out in tokens.css (animate() can't read var())
 const STILL_MS = 150; // shortest time the still frame stays up, so it never just flickers
 
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -51,6 +51,7 @@ export async function playSplash(): Promise<void> {
     easing: 'ease-in',
     fill: 'forwards',
   });
+  // --sun, as a literal to match the still frame painted before tokens.css loads
   splash.animate([{ backgroundColor: '#ffe27a' }, { backgroundColor: 'rgb(255 226 122 / 0)' }], {
     duration: 460,
     delay: 80,

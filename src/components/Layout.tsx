@@ -5,11 +5,15 @@ import { InstallPrompt } from './InstallPrompt';
 import { Celebration } from './Celebration';
 import styles from './Layout.module.css';
 
+// First launch as a guest (or finishing an email link): the sign-in welcome comes first
+export function WelcomeGate() {
+  const { pathname } = useLocation();
+  const welcome = useAccount(needsWelcome);
+  return welcome ? <Navigate to="/welcome" replace state={{ from: pathname }} /> : <Outlet />;
+}
+
 // Tab screens: content + bottom tab bar
 export function Layout() {
-  const location = useLocation();
-  const welcome = useAccount(needsWelcome);
-  if (welcome) return <Navigate to="/welcome" replace state={{ from: location.pathname }} />;
   return (
     <div className={styles.shell}>
       <main className={styles.main}>
