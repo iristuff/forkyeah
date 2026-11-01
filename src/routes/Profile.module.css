@@ -12,14 +12,19 @@
   height: 128px;
   border-radius: 36px;
   background: var(--sun);
-  transform: rotate(-3deg);
+}
+
+.nameField {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin-top: var(--space-md);
 }
 
 .name {
   width: 100%;
-  max-width: 280px;
-  margin-top: var(--space-md);
-  padding: 2px var(--space-sm);
+  min-height: var(--tap-min);
+  padding: 2px var(--tap-min); /* room for the pencil, text stays centred */
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -34,6 +39,19 @@
 .name:hover,
 .name:focus {
   background: var(--card);
+}
+
+.editName {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  background: transparent;
+  color: var(--dim);
+  transform: translateY(-50%);
+}
+
+.editName:active {
+  transform: translateY(-50%) scale(0.94);
 }
 
 .stats {

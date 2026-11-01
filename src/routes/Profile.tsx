@@ -19,6 +19,7 @@ export default function Profile() {
   const exportBackup = useGame(s => s.exportBackup);
   const importBackup = useGame(s => s.importBackup);
   const fileInput = useRef<HTMLInputElement>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const canSignIn = useAccount(s => s.status === 'signed-out');
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
@@ -51,20 +52,30 @@ export default function Profile() {
         <span className={styles.mascot}>
           <Mascot size={112} party />
         </span>
-        <label className="visually-hidden" htmlFor="profile-name">
-          Your name
-        </label>
-        <input
-          id="profile-name"
-          className={styles.name}
-          defaultValue={progress.profile.name}
-          maxLength={24}
-          onBlur={e => {
-            const name = e.target.value.trim();
-            if (name && name !== progress.profile.name) updateProfile({ name });
-            else e.target.value = progress.profile.name;
-          }}
-        />
+        <div className={styles.nameField}>
+          <label className="visually-hidden" htmlFor="profile-name">
+            Your name
+          </label>
+          <input
+            id="profile-name"
+            ref={nameInput}
+            key={progress.profile.name} // show the new name if sign-in changes it
+            className={styles.name}
+            defaultValue={progress.profile.name}
+            maxLength={24}
+            autoComplete="given-name"
+            enterKeyHint="done"
+            onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
+            onBlur={e => {
+              const name = e.target.value.trim();
+              if (name && name !== progress.profile.name) updateProfile({ name });
+              else e.target.value = progress.profile.name;
+            }}
+          />
+          <button type="button" className={`icon-btn ${styles.editName}`} onClick={() => nameInput.current?.select()} aria-label="Change your name">
+            <Icon name="edit" size={20} />
+          </button>
+        </div>
         <p className="dim">
           Level {level.level} · {level.title}
         </p>
