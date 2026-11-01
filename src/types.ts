@@ -50,9 +50,12 @@ export interface ChatMessage {
   dishId?: string;
 }
 
+export type CookingSkill = 'new' | 'some' | 'confident';
+
 export interface Profile {
   name: string;
   emoji: string;
+  skill?: CookingSkill; // set in Profile; the Sous Chef adapts to it
 }
 
 export interface Progress {

@@ -17,6 +17,7 @@ export default function Chef() {
   const stepIdx = dish && Number.isInteger(stepParam) && stepParam >= 0 && stepParam < dish.steps.length ? stepParam : undefined;
 
   const chat = useGame(s => s.progress.chat);
+  const skill = useGame(s => s.progress.profile.skill);
   const addChatMessage = useGame(s => s.addChatMessage);
   const [draft, setDraft] = useState('');
   const [reply, setReply] = useState<string | null>(null); // streaming text
@@ -42,7 +43,7 @@ export default function Chef() {
     abort.current = new AbortController();
     setReply('');
     try {
-      const full = await askChef({ messages: history, dishId: dish?.id, stepIdx }, chunk => setReply(r => (r ?? '') + chunk), abort.current.signal);
+      const full = await askChef({ messages: history, dishId: dish?.id, stepIdx, skill }, chunk => setReply(r => (r ?? '') + chunk), abort.current.signal);
       addChatMessage({ role: 'model', text: full, dishId: dish?.id });
     } catch (err) {
       if (err instanceof ChefError && err.code === 'aborted') return;

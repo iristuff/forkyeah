@@ -9,7 +9,8 @@ import { localStorageRepo, STORAGE_KEY, type ProgressRepo } from './progressRepo
 
 // Bump when the Progress shape changes, and handle the old version in `migrate`
 // v2: photo scoring removed (dishes[].bestScore, 'ai-critic' quest)
-export const STORE_VERSION = 2;
+// v3: optional profile.skill (no data change needed)
+export const STORE_VERSION = 3;
 
 export interface GameState {
   progress: Progress;

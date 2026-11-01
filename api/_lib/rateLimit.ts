@@ -1,5 +1,5 @@
 // Fixed-window rate limiter.
-// Uses Upstash Redis (REST) when UPSTASH_REDIS_REST_URL/TOKEN are set, so limits hold
+// Uses Upstash Redis (REST) when its URL/token env vars are set, so limits hold
 // across serverless instances. Otherwise falls back to per-instance memory (fine for dev).
 
 export interface RateLimitResult {
@@ -53,12 +53,19 @@ export function upstashRateLimiter(url: string, token: string, fetchFn: typeof f
   };
 }
 
+// Upstash's own names, or the KV_* names the Vercel Marketplace integration creates
+export function redisConfig(env: Record<string, string | undefined>): { url: string; token: string } | null {
+  const url = env.UPSTASH_REDIS_REST_URL || env.KV_REST_API_URL;
+  const token = env.UPSTASH_REDIS_REST_TOKEN || env.KV_REST_API_TOKEN;
+  return url && token ? { url, token } : null;
+}
+
 let shared: RateLimiter | undefined;
 
 export function defaultRateLimiter(env: Record<string, string | undefined> = process.env): RateLimiter {
   if (shared) return shared;
-  const { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: token } = env;
-  const limiter = url && token ? upstashRateLimiter(url, token) : memoryRateLimiter();
+  const redis = redisConfig(env);
+  const limiter = redis ? upstashRateLimiter(redis.url, redis.token) : memoryRateLimiter();
   const fallback = memoryRateLimiter();
   // If Redis is down, degrade to memory limits rather than failing every request
   shared = async (key, limit, windowSec) => {

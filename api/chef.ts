@@ -36,13 +36,13 @@ export function createChefHandler(deps: ChefDeps) {
     const model = deps.model();
     if (!model) return jsonError(503, 'not_configured', 'The Sous Chef is not set up yet.');
 
-    const { messages, dishId, stepIdx } = parsed.data;
+    const { messages, dishId, stepIdx, skill } = parsed.data;
     const signal = AbortSignal.any([req.signal, AbortSignal.timeout(TIMEOUT_MS)]);
 
     let chunks: AsyncIterable<string>;
     try {
       chunks = await withRetry(() =>
-        model.streamChat({ system: buildChefSystemPrompt(dishId, stepIdx), history: messages, signal }),
+        model.streamChat({ system: buildChefSystemPrompt(dishId, stepIdx, skill), history: messages, signal }),
       );
     } catch (err) {
       console.error('[chef] upstream_error', (err as Error).message);
